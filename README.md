@@ -505,7 +505,7 @@ environment
      * To run tests in SBT type `test` at the SBT prompt, or type `sbt test` from the command line
      * To run tests in IntelliJ, right click the folder `test` and select **Run 'ScalaTests' in 'test'...**
    * You are welcome to add more testing functions at your discretion, both in the `Main` object and in `DataProcessorTests`.
-   * If code is not running properly, make sure your sources and tests root are set properly.  To do this, right click `src/main`, go to **Mark Directory as**, and select **Sources Root**.  Similarly, right click `src/test`, go to **Mark Directory as**, and select **Test Sources Root**.  The `main` folder should appear blue and the `test` folder should appear green if this is set up correctly.  
+   * If code is not running properly, make sure your sources and tests root are set properly.  To do this, right click `src/main/scala`, go to **Mark Directory as**, and select **Sources Root**.  Similarly, right click `src/test`, go to **Mark Directory as**, and select **Test Sources Root**.  The `scala` folder under `main` should appear blue and the `scala` folder under `test` should appear green if this is set up correctly.  
 
 ### Allowed library/container usage
 
