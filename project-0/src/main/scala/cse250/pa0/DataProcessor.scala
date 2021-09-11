@@ -23,10 +23,18 @@ import cse250.objects.SolarInstallation
 object DataProcessor {
   def splitArrayToRowArray(splitHeaderRow: Array[String]): Array[String] = {
     for(i <- splitHeaderRow.indices) {
-      if(splitHeaderRow(i).contains("\"")) splitHeaderRow(i) += splitHeaderRow(i + 1)
+      if(splitHeaderRow(i).startsWith("\"")) {
+        println(splitHeaderRow(i), splitHeaderRow(i) + splitHeaderRow(i + 1), "yay stupidity")
+        splitHeaderRow(i) += "," + splitHeaderRow(i + 1)
+      }
     }
-    splitHeaderRow.filter(_.endsWith("\"")) ++
-      new Array[String](31 - splitHeaderRow.length).map(_ => "")
+    splitHeaderRow.filter(_.indexOf("\"") <= 0).map(_.stripPrefix("\"").stripSuffix("\""))
+//    splitHeaderRow.filter(x => x.contains("\""))
+//    splitHeaderRow.filter(x => (x.startsWith("\"") && x.endsWith("\"")) ||
+//      (!x.startsWith("\"") && !x.endsWith("\"")))
+//    println(splitHeaderRow)
+//    splitHeaderRow
+//      new Array[String](31 - splitHeaderRow.length).map(_ => "")
 //    splitHeaderRow ++ new Array[String](31 - splitHeaderRow.length).map(_ => "")
   }
 
