@@ -24,11 +24,14 @@ object DataProcessor {
   def splitArrayToRowArray(splitHeaderRow: Array[String]): Array[String] = {
     for(i <- splitHeaderRow.indices) {
       if(splitHeaderRow(i).startsWith("\"")) {
-//        println(splitHeaderRow(i), splitHeaderRow(i) + splitHeaderRow(i + 1), "yay stupidity")
+//        println(s"${splitHeaderRow(i)} \t ${splitHeaderRow(i) + "," +  splitHeaderRow(i + 1)}")
         splitHeaderRow(i) += "," + splitHeaderRow(i + 1)
       }
     }
-    splitHeaderRow.filter(_.indexOf("\"") <= 0).map(_.stripPrefix("\"").stripSuffix("\""))
+    val fixInlineCommas = splitHeaderRow
+      .filter(x => x.indexOf("\"") <= 0 && x.reverse.indexOf("\"") <= 0)
+      .map(_.stripPrefix("\"").stripSuffix("\""))
+    fixInlineCommas ++ new Array[String]((31 - fixInlineCommas.length).max(0))
 //    splitHeaderRow.filter(x => x.contains("\""))
 //    splitHeaderRow.filter(x => (x.startsWith("\"") && x.endsWith("\"")) ||
 //      (!x.startsWith("\"") && !x.endsWith("\"")))

@@ -40,6 +40,7 @@ object Main {
 
       for (line <- lines) {
         val rowData = DataProcessor.splitArrayToRowArray(line.split(","))
+        assert(rowData.length == 31, s"${rowData.length}, $line\n ${rowData.mkString("Array(", ", ", ")")}")
         val installation = DataProcessor.rowArrayToSolarInstallation(rowData)
         dataset.append(installation)
         outputFile.write(installation.toString)
