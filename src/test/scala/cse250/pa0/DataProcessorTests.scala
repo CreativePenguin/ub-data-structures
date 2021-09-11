@@ -18,11 +18,11 @@ import org.scalatest.flatspec.AnyFlatSpec
 
 class DataProcessorTests extends AnyFlatSpec {
   behavior of "DataProcessor.splitArrayToRowArray"
-  it should "return an Array with 32 entries when processing the header row" in {
+  it should "return an Array with 31 entries when processing the header row" in {
     val headerRow = SolarInstallation.HEADERS.mkString(",")
     val splitHeaderRow = headerRow.split(',')
     val result = DataProcessor.splitArrayToRowArray(splitHeaderRow)
-    assert(result.length == 31)
+    assert(result.length === 31)
     for (i <- splitHeaderRow.indices) assert(splitHeaderRow(i) == result(i))
   }
 
@@ -30,7 +30,7 @@ class DataProcessorTests extends AnyFlatSpec {
   it should "produces an array of correct length when processing the first entry (2nd row) of dataset" in {
     val splitSecondRow = SECOND_ROW.split(',')
     val result = DataProcessor.splitArrayToRowArray(splitSecondRow)
-    assert(result.length == 31)
+    assert(result.length === 31, result)
     for (i <- EXPECTED_SECOND_ROW.indices) assert(result(i) == EXPECTED_SECOND_ROW(i))
   }
 

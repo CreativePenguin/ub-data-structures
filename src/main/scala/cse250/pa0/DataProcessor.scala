@@ -21,11 +21,37 @@ package cse250.pa0
 import cse250.objects.SolarInstallation
 
 object DataProcessor {
-  def splitArrayToRowArray(splitHeaderRow: Array[String]): Array[String] = ???
+  def splitArrayToRowArray(splitHeaderRow: Array[String]): Array[String] = {
+    for(i <- splitHeaderRow.indices) {
+      if(splitHeaderRow(i).startsWith("\"")) {
+//        println(splitHeaderRow(i), splitHeaderRow(i) + splitHeaderRow(i + 1), "yay stupidity")
+        splitHeaderRow(i) += "," + splitHeaderRow(i + 1)
+      }
+    }
+    splitHeaderRow.filter(_.indexOf("\"") <= 0).map(_.stripPrefix("\"").stripSuffix("\""))
+//    splitHeaderRow.filter(x => x.contains("\""))
+//    splitHeaderRow.filter(x => (x.startsWith("\"") && x.endsWith("\"")) ||
+//      (!x.startsWith("\"") && !x.endsWith("\"")))
+//    println(splitHeaderRow)
+//    splitHeaderRow
+//      new Array[String](31 - splitHeaderRow.length).map(_ => "")
+//    splitHeaderRow ++ new Array[String](31 - splitHeaderRow.length).map(_ => "")
+  }
 
-  def rowArrayToSolarInstallation(rowData: Array[String]): SolarInstallation = ???
+  def rowArrayToSolarInstallation(rowData: Array[String]): SolarInstallation = {
+    val x = new SolarInstallation()
+    for(i <- SolarInstallation.REQUIRED_HEADERS) {
+      x.fields(i) = rowData(SolarInstallation.HEADERS.indexOf(i))
+    }
+    x
+  }
 
-  def computeUniqueInverterManufacturers(dataset: Array[SolarInstallation]): Int = ???
+  def computeUniqueInverterManufacturers(dataset: Array[SolarInstallation]): Int = {
+    dataset.map(_.fields("PRIMARY_INVERTER_MANUFACTURER")).filter(_ != "").tail.toSet.size
+//    dataset.filter(allManufacturers - _ != allManufacturers)
+  }
 
-  def computeTotalExpectedKWHAnnualProduction(dataset: Array[SolarInstallation]): Float = ???
+  def computeTotalExpectedKWHAnnualProduction(dataset: Array[SolarInstallation]): Float = {
+    dataset.map(_.fields("EXPECTED_KWH_ANNUAL_PRODUCTION")).filter(_ != "").tail.map(_.toFloat.abs).sum
+  }
 }
