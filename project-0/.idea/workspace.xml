@@ -6,8 +6,6 @@
   <component name="ChangeListManager">
     <list default="true" id="d1af0638-0b25-413f-ab3b-e4f3a02a94af" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/cse250/pa0/DataProcessor.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/cse250/pa0/DataProcessor.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/cse250/pa0/Main.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/cse250/pa0/Main.scala" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -87,7 +85,7 @@
     <property name="node.js.selected.package.tslint" value="(autodetect)" />
     <property name="settings.editor.selected.configurable" value="project.propVCSSupport.Mappings" />
   </component>
-  <component name="RunManager" selected="ScalaTest.DataProcessorTests.AssessmentDataProcessor.rowArrayToSolarInstallation should return an exactly the required header fields&#10;AssessmentDataProcessor.rowArrayToSolarInstallation should correctly process the first entry (2nd row) of file">
+  <component name="RunManager" selected="Application.Run">
     <configuration default="true" type="ArquillianJUnit" factoryName="" nameIsGenerated="true">
       <option name="arquillianRunConfiguration">
         <value>
@@ -183,7 +181,7 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="FullBullpen" type="ScalaTestRunConfiguration" factoryName="ScalaTest" show_console_on_std_err="false" show_console_on_std_out="false">
+    <configuration name="FullBullpen" type="ScalaTestRunConfiguration" factoryName="ScalaTest" temporary="true" show_console_on_std_err="false" show_console_on_std_out="false">
       <module name="CSE 250" />
       <option name="allowRunningInParallel" value="false" />
       <option name="projectPathOnTarget" />
@@ -211,11 +209,11 @@
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="ScalaTest.DataProcessorTests.AssessmentDataProcessor.rowArrayToSolarInstallation should return an exactly the required header fields&#10;AssessmentDataProcessor.rowArrayToSolarInstallation should correctly process the first entry (2nd row) of file" />
         <item itemvalue="ScalaTest.DataProcessorTests.AssessmentDataProcessor.rowArrayToSolarInstallation should correctly process the first entry (2nd row) of file" />
+        <item itemvalue="ScalaTest.DataProcessorTests.AssessmentDataProcessor.rowArrayToSolarInstallation should return an exactly the required header fields&#10;AssessmentDataProcessor.rowArrayToSolarInstallation should correctly process the first entry (2nd row) of file" />
+        <item itemvalue="ScalaTest.FullBullpen" />
         <item itemvalue="ScalaTest.DataProcessorTests.DataProcessor.splitArrayToRowArray should produces an array of correct length when processing the first entry (2nd row) of dataset" />
         <item itemvalue="ScalaTest.DataProcessorTests.DataProcessor.splitArrayToRowArray should return an Array with 31 entries when processing the header row" />
-        <item itemvalue="ScalaTest.DataProcessorTests.DataProcessor.splitArrayToRowArray should return an Array with 31 entries when processing the header row&#10;DataProcessor.splitArrayToRowArray should produces an array of correct length when processing the first entry (2nd row) of dataset" />
       </list>
     </recent_temporary>
   </component>
@@ -229,7 +227,7 @@
       <updated>1631254553894</updated>
       <workItem from="1631254561444" duration="1799000" />
       <workItem from="1631257722716" duration="2614000" />
-      <workItem from="1631309738579" duration="10049000" />
+      <workItem from="1631309738579" duration="10345000" />
     </task>
     <servers />
   </component>

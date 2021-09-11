@@ -24,7 +24,7 @@ object DataProcessor {
   def splitArrayToRowArray(splitHeaderRow: Array[String]): Array[String] = {
     for(i <- splitHeaderRow.indices) {
       if(splitHeaderRow(i).startsWith("\"")) {
-        println(splitHeaderRow(i), splitHeaderRow(i) + splitHeaderRow(i + 1), "yay stupidity")
+//        println(splitHeaderRow(i), splitHeaderRow(i) + splitHeaderRow(i + 1), "yay stupidity")
         splitHeaderRow(i) += "," + splitHeaderRow(i + 1)
       }
     }
@@ -52,6 +52,6 @@ object DataProcessor {
   }
 
   def computeTotalExpectedKWHAnnualProduction(dataset: Array[SolarInstallation]): Float = {
-    dataset.map(_.fields("EXPECTED_KWH_ANNUAL_PRODUCTION")).filter(_ != "").tail.map(_.toInt).sum
+    dataset.map(_.fields("EXPECTED_KWH_ANNUAL_PRODUCTION")).filter(_ != "").tail.map(_.toFloat.abs).sum
   }
 }
