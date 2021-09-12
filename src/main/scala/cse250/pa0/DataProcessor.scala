@@ -24,9 +24,7 @@ object DataProcessor {
   def splitArrayToRowArray(splitHeaderRow: Array[String]): Array[String] = {
 //    val mutableSplitHeaderRow =
     for(i <- splitHeaderRow.indices) {
-      if(splitHeaderRow(i).startsWith("\"\"\"")) {
-        splitHeaderRow(i) = splitHeaderRow(i).stripPrefix("\"\"").stripSuffix("\"\"")
-      } else if(splitHeaderRow(i).contains("\"\"")) {
+      if(splitHeaderRow(i).contains("\"\"")) {
         splitHeaderRow(i) = splitHeaderRow(i).replace("\"\"", "\"")
         splitHeaderRow(i) = splitHeaderRow(i).stripPrefix("\"").stripSuffix("\"")
       } else if(splitHeaderRow(i).startsWith("\"")) {
