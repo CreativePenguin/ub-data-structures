@@ -67,10 +67,21 @@ class DataProcessorTests extends AnyFlatSpec {
     assert(rowArray.length === 31)
   }
 
+  it should "properly translate the quotes in csv to data" in {
+    val splitQuoteRow = QUOTE_ROW.split(',')
+    val rowArray = DataProcessor.splitArrayToRowArray(splitQuoteRow)
+    assert(rowArray.length === 31)
+//    assert(rowArray.toString === EXPECTED_QUOTE_ROW.toString)
+    println(rowArray.mkString("Array(", ", ", ")"))
+    for(i <- rowArray.indices) assert(rowArray(i) === EXPECTED_QUOTE_ROW(i))
+  }
 
   val SECOND_ROW = "07/31/2021,0000000276,01001-00018,Ithaca,Tompkins,NY,14850,Non-Residential,Residential/Small Commercial,PON 1184,,,08/02/2003,03/11/2005,Complete,\"Solar Works, Inc.\",Fronius USA,IG 2500-LV POS,1,Sharp,NE-165U5,12,,,1.98,,,No,No,No,POINT (-76.497069 42.443738)"
   val SHORT_ROW = "07/31/2021,0000000276,01001-00018,Ithaca,Tompkins,NY,14850,Non-Residential,Residential/Small Commercial,PON 1184,,,08/02/2003,03/11/2005,Complete,\"Solar Works, Inc.\",Fronius USA,IG 2500-LV POS,1,Sharp,NE-165U5,12,,,1.98,,,,,,"
   val DUMB_ROW = "08/31/2021,0000103762,,\"NEW ROCHELLE,\",Westchester,NY,10801,Residential,Residential/Small Commercial,PON 2112,Consolidated Edison,Purchase,03/27/2018,04/17/2018,Complete,Vivint Solar Development LLC,Enphase Energy Inc.,IQ6-60-x-US (240V),11,Hanwha Q CELLS,Q.PEAK BLK-G4.1 290,11,15940.50,676.00,3.19,2226.00,,No,No,No,POINT (-73.785079 40.917133)"
+  val QUOTE_ROW = "\"\"\"Object Oriented Abstraction\"\"\",\"The \"\"Best\"\" Around\",\"Comma, cell\""
+  val EXPECTED_QUOTE_ROW = Array("\"Object Oriented Abstraction\"", "The \"Best\" Around", "Comma, cell") ++
+    new Array[String](28).map(_ => "")
   val EXPECTED_SECOND_ROW = Array(
     "07/31/2021",
     "0000000276",

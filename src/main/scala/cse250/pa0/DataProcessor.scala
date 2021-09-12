@@ -24,19 +24,27 @@ object DataProcessor {
   def splitArrayToRowArray(splitHeaderRow: Array[String]): Array[String] = {
 //    val mutableSplitHeaderRow =
     for(i <- splitHeaderRow.indices) {
-      if(splitHeaderRow(i).startsWith("\"")) {
+      if(splitHeaderRow(i).startsWith("\"\"\"")) {
+        splitHeaderRow(i) = splitHeaderRow(i).stripPrefix("\"\"").stripSuffix("\"\"")
+      } else if(splitHeaderRow(i).contains("\"\"")) {
+        splitHeaderRow(i) = splitHeaderRow(i).replace("\"\"", "\"")
+        splitHeaderRow(i) = splitHeaderRow(i).stripPrefix("\"").stripSuffix("\"")
+      } else if(splitHeaderRow(i).startsWith("\"")) {
 //        println(s"${splitHeaderRow(i)} \t ${splitHeaderRow(i) + "," +  splitHeaderRow(i + 1)}")
         splitHeaderRow(i) += "," + splitHeaderRow(i + 1)
+        splitHeaderRow(i) = splitHeaderRow(i).stripPrefix("\"").stripSuffix("\"")
         for(j <- i + 1 until splitHeaderRow.length - 1) {
           splitHeaderRow(j) = splitHeaderRow(j + 1)
         }
+        splitHeaderRow(splitHeaderRow.length - 1) = ""
       }
     }
-    println(splitHeaderRow.mkString("Array(", ", ", ")"))
-    val fixInlineCommas = splitHeaderRow
+//    println(splitHeaderRow.mkString("Array(", ", ", ")"))
+//    val fixInlineCommas = splitHeaderRow
 //      .filter(x => x.indexOf("\"") <= 0 && x.reverse.indexOf("\"") <= 0)
-      .map(_.stripPrefix("\"").stripSuffix("\""))
-    (fixInlineCommas ++ new Array[String]((31 - fixInlineCommas.length).max(0))
+//      .map(_.stripPrefix("\"").stripSuffix("\""))
+//    (fixInlineCommas ++ new Array[String]((31 - fixInlineCommas.length).max(0))
+    (splitHeaderRow ++ new Array[String]((31 - splitHeaderRow.length).max(0))
       .map(_ => "")).slice(0, 31)
 //    splitHeaderRow.filter(x => x.contains("\""))
 //    splitHeaderRow.filter(x => (x.startsWith("\"") && x.endsWith("\"")) ||
