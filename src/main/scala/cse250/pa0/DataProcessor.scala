@@ -49,7 +49,7 @@ object DataProcessor {
           newIndexVal += "," + splitHeaderRow(i).replace("\"\"", "\"")
           if(splitHeaderRow(i).endsWith("\"")) {
             inQuote = false
-            newIndexVal = newIndexVal.stripPrefix("\"").stripSuffix("\"")
+            newIndexVal = newIndexVal.stripSuffix("\"")
             rowArray += newIndexVal
           }
         } else if(splitHeaderRow(i).startsWith("\"")) {
