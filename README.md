@@ -1,19 +1,19 @@
-# Project 0: Hello World in Scala!
+# Project 1: Sequences
 
-**Due: Wednesday 09/15/21 Before 5:00 PM**
+**Part 1 Due: Friday 10/15/21 Before 5:00 PM (10 points)**
+
+**Part 2 Due: Friday 10/22/21 Before 5:00 PM (20 points + up to 7 bonus points)**
 
 **Total Points = 30**
 
 ## Objectives
 
 In this assignment, you will: 
-* Read and understand the course AI policy and late policy
-* Review (or learn) Scala basics
-    * Where to find/how to use Scala docs.
-    * How to edit/compile/debug code in Scala.
-    * How to find/read the Scala documentation and use standard libraries
-    * How to read and parse a CSV file in Scala
-    * How to write a file in Scala
+* Define a custom type
+* Create a custom implementation of a mutable.Seq
+* Explore the basics of linked records
+* Implement a linked list using an Array to represent memory
+* Think about your design and how to test it.
 
 ## Useful Resources
 
@@ -21,23 +21,28 @@ Review the lecture notes and provided example code for some insight into the Sca
 syntax.  You will also want to read the Scala references provided below:
 
 * [The Scala API](https://www.scala-lang.org/api/current/index.html)
-  * [scala.collections.mutable.Map](https://www.scala-lang.org/api/current/scala/collection/mutable/Map.html)
   * [Scala Collections](https://docs.scala-lang.org/overviews/collections-2.13/introduction.html)
-* [Scala Tour](https://docs.scala-lang.org/tour/tour-of-scala.html)
-* [Scala Resources](https://docs.scala-lang.org/)
-* [ScalaTest: Writing your first test](https://www.scalatest.org/user_guide/writing_your_first_test)
-* [Maps in Scala](https://docs.scala-lang.org/overviews/collections-2.13/maps.html)
-* [Scala File I/O (Scala Cookbook Excerpt)](https://buffalo.box.com/v/cse250-ScalaCookbookIO)
-* [Scala Exercises](https://www.scala-exercises.org/)
+* [ScalaTest Docs](https://www.scalatest.org/)
+
+Relevant textbook sections:
+* Nature of Arrays / Nature of Lists - § 12.2, 12.3 p406-408
+* Mutable Singly Linked List - § 12.4 p408-417
+* Mutable Doubly Linked List - § 12.5 p417-422
 
 ## Late Policy
 
 The policy for late submissions on assignments is as follows.  Your project grade is 
 the best grade over all per-submission grades (or a 0 if no submissions are made).  
-If a submission is made...
 
-* ... more than 5 days before the deadline, your submission is assigned a grade of 5 bonus points + 100% of the points it earns. 
-* ... up to than 5 days before the deadline, your submission is assigned a grade of 1 bonus point per full day + 100% of the points it earns.
+For part 1, if a submission is made...
+* ... prior to the deadline, your submission is assigned a grade of 100% of the points it earns.
+* ... up to 24 hours after the deadline, your submission is assigned a grade of 75% of the points it earns.
+* ... more than 24 hours after the deadline, but within 48 hours of the deadline, your submission is assigned a grade of 50% of the points it earns.
+* ... more than 48 hours after the deadline, it will not be accepted.
+
+For part 2, if a submission is made...
+* ... more than 5 days before the deadline and your submission earns full credit, your submission is assigned a grade of 5 bonus points + 100% of the points it earns. 
+* ... up to than 5 days before the deadline and your submission earns full credit, your submission is assigned a grade of 1 bonus point per full day + 100% of the points it earns.
 * ... within 24 hours of the deadline, your submission is assigned a grade of 100% of the points it earns.
 * ... up to 24 hours after the deadline, your submission is assigned a grade of 75% of the points it earns.
 * ... more than 24 hours after the deadline, but within 48 hours of the deadline, your submission is assigned a grade of 50% of the points it earns.
@@ -56,8 +61,566 @@ with late submissions **in order to avoid wasting grace days**.
 
 **Keep track of the time if you are working up until the deadline**.  Submissions 
 become late after the set deadline.  Keep in mind that **submissions will close 48
-hours after hte original deadline** and you will not be able to submit your code after 
+hours after the original deadline** and you will not be able to submit your code after 
 that time.
+
+
+
+## Project Setup
+
+1. Update your repository to include materials for PA1 as follows.  From your 
+source directory, run the following commands at the command line.
+```bash
+git remote add project-1 https://gitlab.odin.cse.buffalo.edu/cse-250/project-1.git
+git fetch project-1
+git merge project-1/main
+```
+
+2. Update the copyright statement with your UBIT and person number in the
+   submission files.
+
+3. Review the file contents and read over the comments on what is already 
+   present.  
+
+## Instructions
+
+The following assignment consists of two parts.  Before submitting either part
+make sure that all of your code is committed and pushed into microbase.  
+
+**Only code in the `src/test/scala/cse250/pa1` directory will be considered for 
+part 1, and only code in the `src/main/scala/cse250/pa1` directory will be 
+considered for part 2.**
+
+Once your code is committed and pushed into microbase, log into 
+[microbase](https://microbase.odin.cse.buffalo.edu) and submit your assignment
+to the "Programming Project 1 - Tests" or "Programming Project 1 - 
+Implementation" projects for part 1 and part 2 respectively.
+
+**Expect this project to take 8-10 hours of setting up your environment, reading 
+through documentation, and planning, coding, and testing your solution.**
+
+For **Project 1** you will be allowed 5 submissions, without penalty.  Starting 
+from the 6th submission, you will receive a 2 points per-submission deduction 
+from your score on the assignment.
+
+Your score is the best score of any of your submissions.  If you receive a score
+and resubmit, the higher score will be used.  There is a maximum of 10 
+submissions.
+
+### Overview
+
+In this project, you will implement a class called `LinkedListBuffer` to 
+implement a bounded-capacity linked list.  Buffer elements will reside in a
+fixed-size `Array` that represents a pre-allocated region of memory.  Array 
+indices will be used in place of pointers.
+
+### Problem 1: Tests
+(10 points)
+
+Your first task is to write tests that determine if an implementation of 
+`LinkedListBuffer` adheres to the requirements specified below for each of the
+operations.  In particular, you should ensure that the expected behaviors follow
+from each of the method calls that are to be implemented.  For example, if you 
+append a value and an iterator over the sequence does not include the value, 
+this would not be a correct implementation.
+
+You must implement your tests in the `LinkedListBufferTests` class, located
+in `src/test/scala/cse250/pa1/LinkedListBufferTests.scala`.  From within this
+class, you may call the `createLinkedListBuffer` method to obtain an empty 
+instance of the `LinkedListBuffer` implementation under test.  An example test 
+is already present.
+
+In order to write good tests, you should look through the specification for each
+method and ensure that anywhere a behavior is specified, you should write a test
+that performs a sequence of method calls necessary to expose a problem and to
+ensure that the expected result has occurred.  This will require creating 
+multiple scenarios with various operation sequences.  Similarly if you have 
+requirements that must always hold, you may want to add assertions between 
+method calls that these still hold.
+
+A few notes:
+
+* The tests will not have access to the dataset file.  You should write your 
+  tests without loading any files.
+* If you add members to the `LinkedListBuffer` class, you should avoid 
+  submitting tests that access these fields as they will not compile.  Your 
+  tests should limit access to only what is public in the handout code.
+* Your tests should generally focus on testing **specified** behavior.  This 
+  means specifically behaviors documented below.  For the most part, specified
+  behaviors are limited to the API (i.e., the object's callable methods such
+  as apply, iterator, remove, etc...).  If the specification does not 
+  explicitly say something about how the data is to be organized, it should not
+  be part of the test.
+* The assert method has an optional 2nd parameter that allows you to provide a
+  debug message.  If the assertion fails, this message will be included in the
+  testing log.
+
+Your code will be tested against correct and incorrect implementations of 
+`LinkedListBuffer`.  Your goal is to get all tests to pass on the correct 
+implementation, and for at least one test to fail for an incorrect 
+implementation.
+
+### Problem 2: Implementation
+(20 points)
+
+Your task is to build a mutable sequence that stores a bounded number of 
+elements in the order in which they are provided through a series of insertions
+and removals.  For this assignment, you will have to implement the specified API
+using a specific internal storage scheme.  The internal storage we will be using
+is a fixed-size `Array` holding an embedded list of type `A` objects.  Unlike
+a typical `Array` however, the position of each object is **not** its position
+in the `Array`.  Instead the "nodes" of the list keep note of the indices within
+the array to find the nodes that come before and after in the sequence, like a
+Linked List.
+
+To realize this sequence, your task is to complete the definition of 
+`LinkedListBuffer` by implementing the `mutable.Seq` trait combined with 
+additional methods as follows.  Note that these are implemented using a generic
+type `A`.  If you look at the provided tests and the main method, you will see
+that we can use this with the `SolarInstallation` class.
+
+##### `append(entry: A): Option[A]`
+* Record `entry` into your data store.
+    * The newest entry mut always be stored at the end (tail) of the sequence
+    * Any available slot (empty node) in your backing storage array may be used
+      when one is available.  
+* Update `_numStored` if necessary.  If `capacity` is reached, `_numStored` 
+  should not increase.
+* If the capacity of the backing storage array is reached, you should overwrite
+  the oldest entry (the head) with `entry`.  
+    * This would make the second oldest entry the new oldest (the new head)
+    * This would still make `entry` the newest entry (the new tail)
+    * If an entry is replaced, you should return the replaced entry, otherwise return `None`.
+* Duplicate entries are OK.  We only care about storing them in sequence of 
+  oldest to newest (based on insertion order).
+* The runtime of this function must be O(capacity) (i.e., linear in the maximum
+  size of the sequence) in general.  
+    * In the specific case where the capacity of the list has been reached and
+      the size of the list is not changed by this method, the function must have
+      a runtime of Θ(1) (i.e., constant time when `length` = `capacity`).
+    * 2 bonus points will be awarded if the wall-clock performance of this 
+      function suggests that it always has a runtime of Θ(1) (i.e., constant 
+      time for all calls)
+
+##### `remove(entry: A): Boolean`
+* If `entry` is not currently present in the list, return `false`.  Otherwise,
+  remove all records containing `entry` and return `true`.  
+    * Test for equivalence using `==`.
+* Update `_numStored` if necessary.
+* Any values that are not equal to `entry` should not be moved within `_buffer`.
+* The runtime of this function must be O(length) (i.e., linear in the number of 
+  elements currently in the sequence)
+
+
+##### `countEntry(entry: A): Int`
+* Return a count of the nodes containing the given `entry`.
+    * Test for equivalence using `==`.
+* The runtime of this function must be O(length) (i.e., linear in the number of 
+  elements currently in the sequence)
+
+##### `apply(idx: Int): A`
+* Return the value of the entry at index `idx` within the sequence (0-based indexing)
+* Required by `mutable.Seq`
+* The runtime of this function must be O(idx) (i.e., linear in the index being
+  retrieved).
+* If the index provided is not present (or greater than capacity), the behavior of this function is unspecified.  It is customary to throw an `IndexOutOfBoundsException`.
+
+
+##### `update(idx: Int, elem: A): Unit`
+* Update the entry at index `idx` within the sequence (0-based indexing) to be  `elem`
+* Required by `mutable.Seq`
+* If the index provided is not present (or greater than capacity), the behavior of this function is unspecified.  It is customary to throw an `IndexOutOfBoundsException`.
+* The runtime of this function must be O(idx) (i.e., linear in the index being
+  retrieved).
+
+##### `length`
+* Return the number of elements currently present in the sequence
+* Required by `mutable.Seq`
+* The runtime of this function must be Θ(1) (i.e., constant)
+
+##### `iterator`
+* Return an iterator over the elements of the list.  Elements must be visited
+  in order from oldest to newest.
+    * For your convenience, a template iterator class is defined in the same
+      file.  `LinkedListIterator` is a member class of `LinkedListBuffer`, and
+      as such, its methods have ha access to all instance variables in the 
+      enclosing `LinkedListBuffer` that created it.
+    * Functional `hasNext()` and `next()` methods have already been implemented.
+* Required by `mutable.Seq`
+* The iterator's `remove` method must delete the last element that the `next` 
+  method returned.  The method must have a runtime of Θ(1) (i.e., constant, 
+  per-call)
+    * Note that, unlike the `remove` method on `LinkedListBuffer`, this method
+      **only ever removes a single element.**
+    * Note that you may need to modify other methods in `LinkedListIterator` to
+      implement this method.
+
+### Linked List Organization
+
+You must maintain a "linked list" of entries stored in `_buffer` of your 
+`LinkedListBuffer`.  The nodes of the list are stored within the array as 
+`LinkedListNode` objects.  A `LinkedListNode` contains a `_value` of type 
+`Option[A]`, which may be either `None` if the node is not assigned, or `Some`
+if the node is in-use.  `_value.get` will return the value of the node if it is
+assigned.  You may use `_value.isDefined` to test whether the node has a value.
+The `LinkedListNode` also has indices for `prev` and `next` of type `Int`.  
+
+You should keep in mind the following pointers while maintaining your embedded 
+linked list:
+* When an entry is added, be sure to update the indices of the `_tail`, the 
+  modified node, and possibly `_head` as well.
+* When an entry is removed, be sure to update the indices of the surrounding
+  entries, and possibly `_head` and `_tail` as well.
+* Take care to check if you are removing the head and/or tail and handle these
+  cases separately.
+* **Hint**: If the storage is full, think of insertion as if you were to remove the 
+  head of the list and then use that slot to store the new tail.
+
+Consider the following code:
+
+```scala
+/* 1.  */ val buffer = new LinkedListBuffer[SolarInstallation](4)
+/* 2.  */ val e1, e2, e3, e4, e5 = new SolarInstallation() // allocate 5 objects
+/* 3.  */ // Normally you would initialize e1-e5 here.
+/* 4.  */ buffer.append(e1)
+/* 5.  */ buffer.append(e2)
+/* 6.  */ buffer.append(e3)
+/* 7.  */ buffer.append(e4)
+/* 8.  */ buffer.append(e3)
+/* 9.  */ buffer.remove(e3)   // returns true
+/* 10. */ buffer.append(e5)
+/* 11. */ val iter = buffer.iterator
+/* 12. */ iter.next()         // returns e2
+/* 13. */ iter.next()         // returns e4
+/* 14. */ iter.remove()
+```
+
+The following is a visualization of the internal state of `buffer` for the above
+code.  
+
+##### Following Line 1 execution
+
+<table>
+  <tr>
+    <th colspan=2>None</th>
+    <th colspan=2>None</th>
+    <th colspan=2>None</th>
+    <th colspan=2>None</th>
+  </tr>
+  <tr>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+</table>
+
+```
+capacity: 4
+_numStored: 0
+_head: -1
+_tail: -1
+```
+This represents an empty list, internally.
+
+##### Following Line 4 execution
+
+<table>
+  <tr>
+    <th colspan=2>Some(e1)</th>
+    <th colspan=2>None</th>
+    <th colspan=2>None</th>
+    <th colspan=2>None</th>
+  </tr>
+  <tr>
+    <td>-1</td>
+    <td>-1</td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+</table>
+
+```
+capacity: 4
+_numStored: 1
+_head: 0
+_tail: 0
+```
+This corresponds to the list `Seq( e1 )`
+
+##### Following Line 5 execution
+
+<table>
+  <tr>
+    <th colspan=2>Some(e1)</th>
+    <th colspan=2>Some(e2)</th>
+    <th colspan=2>None</th>
+    <th colspan=2>None</th>
+  </tr>
+  <tr>
+    <td>-1</td>
+    <td>1</td>
+    <td>0</td>
+    <td>-1</td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+</table>
+
+```
+capacity: 4
+_numStored: 2
+_head: 0
+_tail: 1
+```
+This corresponds to the list `Seq( e1, e2 )`, stored as `[e1]` ↔ `[e2]`
+
+##### Following Line 6 execution
+
+<table>
+  <tr>
+    <th colspan=2>Some(e1)</th>
+    <th colspan=2>Some(e2)</th>
+    <th colspan=2>Some(e3)</th>
+    <th colspan=2>None</th>
+  </tr>
+  <tr>
+    <td>-1</td>
+    <td>1</td>
+    <td>0</td>
+    <td>2</td>
+    <td>1</td>
+    <td>-1</td>
+    <td></td>
+    <td></td>
+  </tr>
+</table>
+
+```
+capacity: 4
+_numStored: 3
+_head: 0
+_tail: 2
+```
+This corresponds to the list `Seq( e1, e2, e3 )`, 
+stored as `[e1]` ↔ `[e2]` ↔ `[e3]`
+
+##### Following Line 7 execution
+
+<table>
+  <tr>
+    <th colspan=2>Some(e1)</th>
+    <th colspan=2>Some(e2)</th>
+    <th colspan=2>Some(e3)</th>
+    <th colspan=2>Some(e4)</th>
+  </tr>
+  <tr>
+    <td>-1</td>
+    <td>1</td>
+    <td>0</td>
+    <td>2</td>
+    <td>1</td>
+    <td>3</td>
+    <td>2</td>
+    <td>-1</td>
+  </tr>
+</table>
+
+```
+capacity: 4
+_numStored: 4
+_head: 0
+_tail: 3
+```
+This corresponds to the list `Seq( e1, e2, e3, e4 )`, 
+stored as `[e1]` ↔ `[e2]` ↔ `[e3]` ↔ `[e4]`
+
+##### Following Line 8 execution
+
+<table>
+  <tr>
+    <th colspan=2>Some(e3)</th>
+    <th colspan=2>Some(e2)</th>
+    <th colspan=2>Some(e3)</th>
+    <th colspan=2>Some(e4)</th>
+  </tr>
+  <tr>
+    <td>3</td>
+    <td>-1</td>
+    <td>-1</td>
+    <td>2</td>
+    <td>1</td>
+    <td>3</td>
+    <td>2</td>
+    <td>0</td>
+  </tr>
+</table>
+
+```
+capacity: 4
+_numStored: 4
+_head: 1
+_tail: 0
+```
+
+As the capacity has been reached, the head of the list is replaced by the newly
+appended `e3`.  This corresponds to the list `Seq( e2, e3, e4, e3 )`, 
+stored as `[e2]` ↔ `[e3]` ↔ `[e4]` ↔ `[e3]`.
+Note the changes to `_head` and `_tail`.
+
+##### Following Line 9 execution
+
+<table>
+  <tr>
+    <th colspan=2>None</th>
+    <th colspan=2>Some(e2)</th>
+    <th colspan=2>None</th>
+    <th colspan=2>Some(e4)</th>
+  </tr>
+  <tr>
+    <td></td>
+    <td></td>
+    <td>-1</td>
+    <td>3</td>
+    <td></td>
+    <td></td>
+    <td>1</td>
+    <td>-1</td>
+  </tr>
+</table>
+
+```
+capacity: 4
+_numStored: 2
+_head: 1
+_tail: 3
+```
+
+Both copies of `e3` are removed.  This corresponds to the list `Seq( e2, e4 )`, 
+stored as `[e2]` ↔ `[e4]`
+Note the changes to `_head` and `_tail`.
+
+##### Following Line 10 execution
+
+<table>
+  <tr>
+    <th colspan=2>None</th>
+    <th colspan=2>Some(e2)</th>
+    <th colspan=2>Some(e5)</th>
+    <th colspan=2>Some(e4)</th>
+  </tr>
+  <tr>
+    <td></td>
+    <td></td>
+    <td>-1</td>
+    <td>3</td>
+    <td>3</td>
+    <td>-1</td>
+    <td>1</td>
+    <td>2</td>
+  </tr>
+</table>
+
+```
+capacity: 4
+_numStored: 3
+_head: 1
+_tail: 2
+```
+
+The newly added `e5` may be added into either of the free slots at indices 0 and
+2.  The above example inserts it into the slot at index 2.
+This corresponds to the list `Seq( e2, e4, e5 )`, 
+stored as `[e2]` ↔ `[e4]` ↔ `[e5]`.
+
+##### Following Line 14 execution
+
+<table>
+  <tr>
+    <th colspan=2>None</th>
+    <th colspan=2>Some(e2)</th>
+    <th colspan=2>Some(e5)</th>
+    <th colspan=2>None</th>
+  </tr>
+  <tr>
+    <td></td>
+    <td></td>
+    <td>-1</td>
+    <td>2</td>
+    <td>1</td>
+    <td>-1</td>
+    <td></td>
+    <td></td>
+  </tr>
+</table>
+
+```
+capacity: 4
+_numStored: 2
+_head: 1
+_tail: 2
+```
+
+The iterator remove operation removes the list node at the last index to be
+returned by the `next` method (`e4` at array index 3), here.
+This corresponds to the list `Seq( e2, e5 )`, 
+stored as `[e2]` ↔ `[e5]`.
+Note the changes to the `_next` and `_prev` pointers of the nodes holding `e2` 
+and `e5` respectively.
+
+## Suggested approach
+
+
+1. Read over the tasks and make notes on what each part is supposed to do and
+   what invariants it should maintain.
+
+2. Write your tests to the extent that you feel it would be sufficient that if
+   you pass all of them your work is complete.
+
+3. Begin work on `append` and try adding values and checking that they are 
+   present in the array.  You can do so with the iterator, or the initialy 
+   provided unit tests.  Note that if your list isn't linked correctly, your 
+   iterator may cause an infinite loop.
+      * Check that your lists are updating appropriately.
+      * Add more items than your backing storage array can hold to see that you
+        wrap properly.
+      * Use the debugger to step through method executions or use print 
+        statements to log a trace through your methods to ensure that they work
+        as expected.
+
+4. Next work on the `countEntry` and `LinkedListIterator.remove` methods.
+
+5. After this, the outer `remove` entry should be easier to approach.
+
+6. `apply` and `update` both depend on other functionality to work correctly, 
+  but may be completed at any time.
+
+It is particularly important to follow some semblance of this approach when
+working on the assignment, as it will be confusing to work out of this order.
+For instance, it doesn't make sense trying to work on removal of data when 
+nothing is stored.  
+
+Be sure to test as you go.  **Don't wait until the end to test!**
+
+
+
+## Allowed library/container usage
+
+* The provided template already references `scala.collection.mutable.Seq` and 
+  `scala.collection.Iterator`, traits, and `scala.Array`.  
+* You may not any other uses of containers or traits from the scala collection 
+  library.
+
 
 ## AI Policy Overview
 
@@ -177,345 +740,6 @@ as well as a brief description of what was used.  For example, if you reference 
 textbook, a page number and description is sufficient.  If you copy example code from 
 the Scala Language API, then include the link to the class page within the API as well
 as where the example code resides.
-
-## Project Setup
-
-### Supported Platforms 
-
-Scala is based on the Java Virtual Machine, and so will run on most modern 
-operating systems.  However, only the following platforms are officially 
-supported by this course.
-* Ubuntu Linux
-* MacOS with [Homebrew](https://brew.sh)
-* IntelliJ on Windows
-
-Instructions for Ubuntu should work without change for any Debian-based Linux 
-distribution (Ubuntu, PopOS!, Debian, Mint).  
-
-The [Windows Subsystem for Linux](https://docs.microsoft.com/en-us/windows/wsl/about),
-along with the [Ubuntu](https://ubuntu.com/wsl) package will allow windows users to
-follow the Ubuntu instructions.
-
-**Course staff will make every attempt to assist you if you are using a platform that 
-is not officially supported, but may lack the expertise needed to resolve your 
-issue**.
-
-### The Command Line
-
-Instructions in class assignments will require running commands from the command line.
-You'll need to access the command line with a terminal (type `terminal` in MacOS's 
-spotlight or the Ubuntu launcher).  You should see a command prompt.  For example: 
-```
--bash-4.2$ 
-```
-You can type commands at this prompt.  Commands usually have the form
-```
-[command name] [argument 1] [argument 2] [argument 3] ...
-```
-Common commands include:
-* `pwd`: Print the current working directory (usually starts as `/home/[username]`)
-* `ls`: List all the files in the current working directory
-  * Files and directories starting with a `.` (dot) are "hidden".  To show hidden files and directories as well, use `ls -a` 
-* `cd [dirname]`: Move the current working directory to `[dirname]`.  
-  * `.` is a special directory name that refers to the current directory.  E.g., if your current working directory is `/home/zaphod` then `cd .` wouldn't change the directory at all.
-  * `..` is a special directory name that refers to the parent directory.  E.g., if your current working directory is `/home/zaphod` then `cd ..` would move the working directory to `/home`
-  * `~` (tilde) is a special directory name that refers to your home directory (typically `/home/[username]`).
-* `man [command]`: Read the manual page for `[command]`.
-* `cat [filename]`: Display (con**cat**enate to the console) the contents of `[filename]`. 
-
-A package manager is like an app-store for the command line.  Ubuntu uses `apt`. MacOS
-does not have a built-in package manager, but there are several that you can 
-install.  This course assumes that you are using [Homebrew](https://brew.sh).  To
-install a piece of software, type:
-* **Ubuntu**: `apt install [name of package]`
-* **MacOS**: `brew install [name of package]`
-
-To find the name of a package, you can use:
-* **Ubuntu**: `apt search [keywords]`
-* **MacOS**: `brew search [keywords]`
-
-### Editor + SBT
-
-You will need a text editor and a Scala compiler for this course.  Popular editors 
-include
-* Emacs (`{brew/apt} install emacs`)
-* Vim (`{brew/apt} install vim`)
-* [SublimeText](https://www.sublimetext.com/)
-
-Instructions for the course will be given using [SBT](https://www.scala-sbt.org/),
-although other build tools exist.  For example, [mill](https://com-lihaoyi.github.io/mill/mill/Intro_to_Mill.html) 
-and [bloop](https://scalacenter.github.io/bloop/) can be a little bit faster, but are
-also a little less well-documented.
-
-Install SBT with `{brew/apt} install sbt` or the instructions [here](https://www.scala-sbt.org/1.x/docs/Setup.html)
-
-### IntelliJ
-
-At your option, you may find it more convenient to use IDE (an all-in-one system that 
-includes both an editor and a compiler).  A popular IDE for scala development that 
-course staff are familiar with is [IntelliJ](https://www.jetbrains.com/idea/download/).
-Installers for Ubuntu are available via [Flatpak](https://flatpak.org/setup/Ubuntu/).
-
-You will need to install the **Scala** plugin (File → Settings → Plugins → Scala).
-
-### Set up Microbase GIT
-
-GIT uses Public/Private keys to authenticate you to the server.  Generate a 
-public/private keypair (if you don't already have one) as follows: 
-1. Open a terminal.
-2. Type `ssh-keygen`
-3. Follow the default prompts
-4. Your public key is in `~/.ssh/id_rsa.pub` (remember that `~` is your home directory and that directory names starting with a `.` are hidden)
-   * Your private key is in `~/.ssh/id_rsa`.  **Keep this file secret and safe!**
-
-Next, you'll need to provide your **public** key to the server.   
-1. Go to [https://microbase.odin.cse.buffalo.edu/](https://microbase.odin.cse.buffalo.edu/)
-2. Enter your UB email address
-3. Click the link in your email.  The token will be valid for 5 hours.
-4. In the Key Management section of the page, enter a name for your computer in the appropriate box
-5. Paste your **public** key (`~/.ssh/id_rsa.pub`) into the appropriate box. **DO NOT UPLOAD YOUR *PRIVATE* KEY**
-  * **MacOS Shortcut**: `cat ~/.ssh/id_rsa.pub | pbcopy` copies your public key so you can paste it with Cmd-V.
-  * **Ubuntu Shortcut**: `cat ~/.ssh/id_rsa.pub | xclip -i -selection clip` copies your public key so you can paste it with Ctrl-V.
-6. Wait about 5 minutes.  You should be able to access your repository at `microbase@odin.cse.buffalo.edu:{YOUR UBIT}.git`
-
-Initialize your repository as follows. Replacing `{YOUR UBIT}` with your UBIT, run 
-the following from the working directory where you want your code to live.
-```bash
-git clone https://gitlab.odin.cse.buffalo.edu/cse-250/project-0.git
-cd project-0
-git remote rename origin instructor_code
-git remote add origin microbase@odin.cse.buffalo.edu:{YOUR UBIT}.git
-git push -u origin main
-```
-
-*If you are using IntelliJ, you may be asked if you want to import an SBT project 
-when you first open the directory.  Say yes.*
-
-This template project contains both SBT and IntelliJ project definitions.  
-
-## Instructions
-
-Answer the following questions by submitting your answers to Microbase via the
-"Programming Project 0" assignment.  Make sure your submission is committed and
-pushed into your microbase GIT repository.  Log into Microbase and submit your
-project.
-
-**Expect this project to take 8-10 hours of setting up your environment, reading 
-through documentation, and planning, coding, and testing your solution.**
-
-### NYS Open Data - Solar Installation Sites
-
-*(30 points)*
-
-We will be making use of a public dataset released by the NYS energy department 
-(NYSERDA) of solar energy installation sites.  You can download the dataset at the 
-[NYS Open Data Portal](https://data.ny.gov/Energy-Environment/Solar-Electric-Programs-Reported-by-NYSERDA-Beginn/3x8r-34rs)
-by clicking on **Export** → **CSV**.  
-
-Your task with this dataset will be to sanitize and summarize the data file.  There 
-are a number of columns that are not of interest to us, so we will create an updated
-data file without these columns, while also obtaining some summary statistics.
-
-**Note:** Although the specific tasks you will perform in this assignment are 
-simplified to make them viable in the time allotted for the project, they are 
-representative of common data processing tasks used for data exploration, 
-visualization, and transformation, as well as for machine learning.  
-
-**Problem 1** *(15 points)*: In the object `cse250.pa0.DataProcessor` define the
-Scala function:
-```scala
-splitArrayToRowArray(splitHeaderRow: Array[String]): Array[String]
-```
-with the following behavior:
-* Assume that `splitHeaderRow` is the result from taking some line from the Solar Installations dataset and invoking `split(',')`.
-* Given `splitHeaderRow`, place the data into an `Array` corresponding to the columns that would result from opening the original dataset file with a spreadsheet application.
-
-Note that every row processed should produce a return result that contains the same 
-number of column entries as the header row for the document.  This means that each
-row, even if there are empty cells, should return an `Array` with 31 columns (even
-if some are empty strings).  **Hint:** review the documentation for the `split` 
-method for the cases where there are empty entries in a row.  **Hint**: Be mindful of
-rows that contain cells with commas (see the CSV representation rules below).
-
-A good way to test this functionality is to ensure that the first row of the dataset,
-which contains the header, should return a copy of the row.  The second row of the
-dataset, which contains successive blank entries, should still return a row with 31 
-entries, but should have two empty values for the `ELECTRIC_UTILITY` and 
-`PURCHASE_TYPE` fields, respectively.  Feel free to add the tests provided in this 
-handout.
-
-**Problem 2** *(5 points)*: In the object `cse250.pa0.DataProcessor` define the
-Scala function:
-```scala
-rowArrayToSolarInstallation(rowArray: Array[String]): SolarInstallation
-```
-with the following behavior:
-* Assume that the input `rowArray` is an `Array` containing 31 entries, corresponding to a row that was correctly processed through `splitArrayToRowArray`.
-* Return the `SolarInstallation` object that corresponds to the data stored within the row.
-
-Note that `SolarInstallation` is only meant to hold a limited number of headers from 
-the dataset.  The headers that are required to be present are stored in the `Seq` 
-named `SolarInstallation.REQUIRED_HEADERS`.  A full list of all headers is stored
-in the `Seq` named `SolarInstallation.HEADERS`.  
-
-The required headers correspond to the following headers/columns (where column 
-number 0 corresponds to the first/left-most column): 
-
-| Column | Label
-| ------ | -----------------------------------------
-| 0      | REPORTING_PERIOD
-| 1      | PROJECT_NUMBER
-| 3      | CITY
-| 4      | COUNTY
-| 5      | STATE
-| 6      | ZIP_CODE
-| 7      | SECTOR
-| 11     | PURCHASE_TYPE
-| 12     | DATE_APPLICATION_RECEIVED
-| 13     | DATE_COMPLETED
-| 14     | PROJECT_STATUS
-| 15     | CONTRACTOR
-| 16     | PRIMARY_INVERTER_MANUFACTURER
-| 17     | PRIMARY_INVERTER_MODEL_NUMBER
-| 18     | TOTAL_INVERTER_QUANTITY
-| 19     | PRIMARY_PV_MODULE_MANUFACTURER
-| 20     | PV_MODULE_MODEL_NUMBER
-| 21     | TOTAL_PV_MODULE_QUANTITY
-| 22     | PROJECT_COST
-| 23     | INCENTIVE
-| 24     | TOTAL_NAMEPLATE_KW_DC
-| 25     | EXPECTED_KWH_ANNUAL_PRODUCTION
-| 27     | AFFORDABLE_SOLAR
-| 28     | COMMUNITY_DISTRIBUTED_GENERATION
-| 29     | GREEN_JOBS_GREEN_NEW_YORK_PARTICIPANT
-
-When you are finished, a `SolarInstallation` should contain exactly 25 entries (one
-piece of data associated with each header).  This will cause the resulting updated
-output file after running the given code to contain exactly 25 columns in each
-row.  See more on the `SolarInstallation` Objects section below.
-
-**Problem 3** *(5 points)* In the object `cse250.pa0.DataProcessor` define the
-Scala function:
-```scala
-computeUniqueInverterManufacturers(dataset: Array[SolarInstallation]): Int
-``` 
-that determines the number of unique Inverter Manufacturers (corresponding to the
-`PRIMARY_INVERTER_MANUFACTURER` column).  You should ignore any empty entry from
-your count, as well as the column header.
-
-**Problem 5** *(5 points)* In the object `cse250.pa0.DataProcessor` define the
-Scala function:
-```scala
-computeTotalExpectedKWHAnnualProduction(dataset: Array[SolarInstallation]): Float
-``` 
-that determines the sum of the total KWH of annual expected energy production
-(corresponding to the `EXPECTED_KWH_ANNUAL_PRODUCTION` column).  Note that your 
-answer produced should make sense, so you should assume that the energy produced
-should be positive.  If no valid data is found, you should return 0.
-
-
-### `SolarInstallation` Objects
-
-To represent a single data record, you must use the structure 
-`cse250.objects.SolarInstallation` provided in the code skeleton.  
-```scala
-/**
- * One specific solar installation site.
- */
-class SolarInstallation
-{
-  /**
-   * Key-value pairs representing data about the solar site.  See [[SolarInstallation.HEADERS]] for a list of
-   * allowable keys, and [[SolarInstallation.REQUIRED_HEADERS]] for a list of mandatory keys.
-   */
-  val fields: mutable.Map[String, String] = new mutable.HashMap[String, String]
-```
-
-Note that the file containing `SolarInstallation` will be overwritten when your 
-code is graded, so any changes you make within will be reverted.  
-
-The information stored within a `SolarInstallation` should be stored in the `fields`
-attribute, which stores (**key** → **value**) pairs, where the header for the column
-(**value** in the respective column in the first row) is the **key** and the value 
-is the data found within the row in the corresponding column.  For example, the 
-first installation (second row of the file) should be loaded as 
-
-| Key                                     | Value        |
-| --------------------------------------- | ------------ |
-| `REPORTING_PERIOD`                      | `07/31/2021` |
-| `PROJECT_NUMBER`                        | `0000000276` |
-| `CITY`                                  | `Ithaca`     |  
-|                   ...                                 ||
-| `GREEN_JOBS_GREEN_NEW_YORK_PARTICIPANT` | `No`         |
-
-Note that the value for `ELECTRIC_UTILITY` is simply an empty string, and there 
-should be an entry for every header.  
-
-### CSV Formatting
-
-The formatting for the data file is CSV (comma-separated values).  CSV files are a 
-way to represent columns of data by separating entries within a row by a comma. Each 
-line represents a separate row of cells.  Two special cases arise that you must 
-handle:
-* If a cell contains a comma (`,`) within, the cell contents are enclosed in double quotes (`"`) at the start and end.  For example: `Comma, Cell` would be stored as `"Comma, Cell"`.
-* If a cell contains a double quote (`"`) within, the cell contents are enclosed in double quotes (`"`) at the start and end, **and** each double quote in the cell data is duplicated.  For example, `The "Best" Around` would be stored as `"The ""Best"" Around"`
-
-It is also possible that a cell contains both.  Note that if a data file contained the line
-```text
-First Cell,Second Cell,"The ""Best"" Around","Comma, Cell","""Object-Orientation, Abstraction, and Data Structures Using Scala"""
-```
-It would correspond to the following cells (e.g., if opened in Excel):
-
-| 1          | 2           | 3                 | 4           | 5                                                                  | 
-| ---------- | ----------- | ----------------- | ----------- | ------------------------------------------------------------------ |
-| First Cell | Second Cell | The "Best" Around | Comma, Cell | "Object-Orientation, Abstraction, and Data Structures Using Scala" |  
-
-### Suggested Approach
-
-Set up your microbase repository as detailed above and set up your programming 
-environment
-
-#### SBT
-
-1. There are three files in the `src` directory.  Open them with your code editor of choice.
-2. Launch sbt by navigating to the root of your project directory in a terminal window and typing `sbt`.
-3. Set up continuous compilation by typing `~compile` at the sbt prompt. 
-
-#### IntelliJ
-
-1. Open IntelliJ
-2. Select Open (possibly File → Open).
-3. Navigate the the directory you checked out above.  Click OK
-4. Confirm the request to import an SBT project if prompted.
-5. Open `Main.scala` (src → main → scala → cse250 → pa0).  Test that the code builds properly by right-clicking Main →Run "Main".  If it ran correctly, you should see one of the following two errors
-   * `Exception in thread "main" scala.NotImplementedError: an implementation is missing`
-   * `Exception in thread "main" java.io.FileNotFoundException: data/Solar_Electric_Programs_Reported_by_NYSERDA__Beginning_2000.csv  (No such file or directory)`
-6. Download the Solar Installations dataset and move it to the `project-0/data` directory.
-   * The data file can then be opened by the filename `data/Solar_Electric_Programs_Reported_by_NYSERDA__Beginning_2000.csv`
-   * I recommend you make a smaller test file of entries to work on.  To do this, make a copy of the solar installations file and then remove all of the lines after the first 10 or 100, etc..., and then save the file.
-   * **It is not recommended to make modifications to the file in Excel as there may be unintended formatting side-effects upon saving.**
-   * If viewing the `.csv` file in IntelliJ, I recommend **not** installing the plugin so you can continue viewing it as text, instead of the view that would be provided by software like Excel.  This is beneficial so you can see how the data you are manipulating looks.
-7. Update the copyright statements in the necessary files with your name and UBIT.
-8. Begin working on the problems requested. 
-   * Note that when working on translating the rows from the csv data file, the last column of the data (when non-empty) contains a comma and should be treated as a single entry.  There may be other data entries that contain commas, as well, so be sure you think about how to handle this (look at the data set in a text editor/IntelliJ to see what the format is).
-   * To check that this works, try adding print statements (`println(text)`), or by pausing the program in IntelliJ's debugger with breakpoints to check that the data is being read as you expected.
-   * It is suggested to test your code via the file `DataProcessorTests`, although a `Main` class is also provided.
-     * To run the `Main` class in SBT, type `run` at the SBT prompt, or type `sbt run` from the command line
-     * To run the `Main` class in IntelliJ, right-click the `Main.scala` file and select **Run Main**
-     * To run tests in SBT type `test` at the SBT prompt, or type `sbt test` from the command line
-     * To run tests in IntelliJ, right click the folder `test` and select **Run 'ScalaTests' in 'test'...**
-   * You are welcome to add more testing functions at your discretion, both in the `Main` object and in `DataProcessorTests`.
-   * If code is not running properly, make sure your sources and tests root are set properly.  To do this, right click `src/main/scala`, go to **Mark Directory as**, and select **Sources Root**.  Similarly, right click `src/test`, go to **Mark Directory as**, and select **Test Sources Root**.  The `scala` folder under `main` should appear blue and the `scala` folder under `test` should appear green if this is set up correctly.  
-
-### Allowed library/container usage
-
-* You may choose the collection classes you wish to use in your function implementation to solve these problems.
-
-## Submission
-
-For **Project 0** you will be allowed 5 submissions, without penalty.  Starting from the 6th submission, you will receive a 2 points per-submission deduction from your score on the assignment.
-
-Your score is the best score of any of your submissions.  If you receive a score and resubmit, the higher score will be used.  There is a maximum of 10 submissions.
 
 
 ## Revision History
