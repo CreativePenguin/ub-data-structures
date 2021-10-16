@@ -85,6 +85,8 @@ class LinkedListBufferTests extends AnyFlatSpec {
 
     // "append()" should "return None (isEmpty), and increase in _numstored size" in
       assert(li1.append(0).isEmpty)
+    assert(li1._tail === 0)
+    assert(li1._buffer(li1._tail).get === 0)
       assert(li1._numStored === 1)
       assert(li1.append(1).isEmpty)
       assert(li1.append(2).isEmpty)
@@ -96,10 +98,13 @@ class LinkedListBufferTests extends AnyFlatSpec {
       assert(li1._head === 1)
       assert(li1._tail === 0)
 
-//    "append()" should "not break for duplicates" in
+    // "append()" should "not break for duplicates" in
       assert(li1.append(4) === 1)
+    assert(li1._head === 2)
+    assert(li1._head === 1)
       assert(li1.append(3) === 2)
       assert(li1.append(3) === 3)
+    assert(li1._buffer(li1._tail).get === 3)
       assert(li1._numStored === 3)
 
   }
@@ -120,7 +125,7 @@ class LinkedListBufferTests extends AnyFlatSpec {
     // it should "get rid of all instances of value" in
       assert(li1.remove(0))
       assert(li1._numStored === 1)
-      assert(li1._buffer(1) === 1)
+      assert(li1._buffer(1).get === 1)
 
 //      assert(li1.remove(0))
 //      assert(li1._buffer(1) === 1)
