@@ -120,7 +120,7 @@ class LinkedListBufferTests extends AnyFlatSpec {
     // it should "get rid of all instances of value" in
       assert(li1.remove(0))
       assert(li1._numStored === 1)
-      assert(li1._buffer(1) === 1)
+      assert(li1._buffer(1).get === 1)
 
 //      assert(li1.remove(0))
 //      assert(li1._buffer(1) === 1)
