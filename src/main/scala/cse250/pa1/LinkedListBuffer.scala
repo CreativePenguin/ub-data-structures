@@ -44,7 +44,10 @@ class LinkedListBuffer[A](capacity: Int)
    * 
    * (assume that all times are non-amortized unless otherwise specified).
    */
-  def append(entry: A): Option[A] = ???
+  def append(entry: A): Option[A] = {
+    println("fart")
+    None
+  }
 
   /**
    * Remove all instances of an element from the sequence.
@@ -57,7 +60,10 @@ class LinkedListBuffer[A](capacity: Int)
    * 
    * This function must run in O(n) time, where n = [[length]] 
    */
-  def remove(entry: A): Boolean = ???
+  def remove(entry: A): Boolean = {
+    println("gun")
+    false
+  }
 
   /**
    * Return the current length of the sequence
@@ -105,7 +111,11 @@ class LinkedListBuffer[A](capacity: Int)
    * 
    * This function must run in O(n) time, where n = `idx`
    */
-  def update(idx: Int, elem: A): Unit = ???
+  def update(idx: Int, elem: A): Unit = {
+    if(idx < 0 || idx > _numStored - 1) {
+      throw new IndexOutOfBoundsException
+    }
+  }
 
   /**
    * Return an iterator over the elements of this sequence
