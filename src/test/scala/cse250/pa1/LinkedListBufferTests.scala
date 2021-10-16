@@ -130,7 +130,7 @@ class LinkedListBufferTests extends AnyFlatSpec {
 
       assert(li1.remove(1))
       assert(li1._numStored === 0)
-    
+
   }
 
   "countEntry()" should "return the number of values" in {

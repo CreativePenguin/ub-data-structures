@@ -44,10 +44,7 @@ class LinkedListBuffer[A](capacity: Int)
    * 
    * (assume that all times are non-amortized unless otherwise specified).
    */
-  def append(entry: A): Option[A] = {
-    println("fart")
-    None
-  }
+  def append(entry: A): Option[A] = ???
 
   /**
    * Remove all instances of an element from the sequence.
@@ -60,11 +57,7 @@ class LinkedListBuffer[A](capacity: Int)
    * 
    * This function must run in O(n) time, where n = [[length]] 
    */
-  def remove(entry: A): Boolean = {
-    println("gun")
-    false
-  }
-
+  def remove(entry: A): Boolean = ???
   /**
    * Return the current length of the sequence
    * @return                The number of elements in the sequence
