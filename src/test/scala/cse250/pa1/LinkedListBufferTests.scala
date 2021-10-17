@@ -167,8 +167,10 @@ class LinkedListBufferTests extends AnyFlatSpec {
 
     li5.append('j')
     assert(li5.apply(0) === 'j')
+    assert(li5._buffer(0).get === 'j')
     li5.append('d')
     assert(li5.apply(1) === 'd')
+    assert(li5._buffer(1).get === 'd')
 //    assertThrows[IndexOutOfBoundsException] {
 //      li5.apply(6)
 //    }
