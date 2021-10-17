@@ -79,6 +79,12 @@ class LinkedListBufferTests extends AnyFlatSpec {
 
   }
 
+//  "LinkedListBuffer" should "let me grab it's values" in {
+//    val li0 = new LinkedListBuffer[Int](3)
+//    li0._buffer(0).set(3)
+//    assert(li0._buffer(0).get === 3)
+//  }
+
   behavior of "append()"
   it should "pass all requirements" in {
     val li1 = new LinkedListBuffer[Int](3)
@@ -91,15 +97,15 @@ class LinkedListBufferTests extends AnyFlatSpec {
       assert(li1._numStored === 3)
 
     // "append() past capacity size" should "properly adjust head and tail, and _numstored" in
-      assert(li1.append(3) === 0)
+      assert(li1.append(3) === Some(0))
       assert(li1._numStored === 3)
       assert(li1._head === 1)
       assert(li1._tail === 0)
 
 //    "append()" should "not break for duplicates" in
-      assert(li1.append(4) === 1)
-      assert(li1.append(3) === 2)
-      assert(li1.append(3) === 3)
+      assert(li1.append(4) === Some(1))
+      assert(li1.append(3) === Some(2))
+      assert(li1.append(3) === Some(3))
       assert(li1._numStored === 3)
 
   }
