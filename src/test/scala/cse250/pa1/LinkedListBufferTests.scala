@@ -116,8 +116,8 @@ class LinkedListBufferTests extends AnyFlatSpec {
     assert(li1._head === 1)
     assert(li1._tail === 0)
     assert(li1._buffer(li1._head).get === 1)
-    assert(li1._buffer(0)._prev === 2)
-    assert(li1._buffer(2)._next === 0)
+//    assert(li1._buffer(0)._prev === 2)
+//    assert(li1._buffer(2)._next === 0)
     assert(li1._buffer(li1._tail).get === 3)
 
     // "append()" should "not break for duplicates" in
@@ -151,8 +151,12 @@ class LinkedListBufferTests extends AnyFlatSpec {
     li1.append(-1)
     assert(li1.remove(0))
     assert(li1._numStored === 2)
+//    assert(li1._buffer(0) !==)
+    assertThrows[NoSuchElementException] {
+
     assert(li1.apply(0) !== 0)
     assert(li1.apply(3) !== 0)
+    }
     assert(li1._buffer(1).get === 1)
     assert(li1._buffer(1)._next === 3)
     assert(li1._buffer(1)._prev !== 0)
