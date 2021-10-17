@@ -30,6 +30,7 @@ class LinkedListBufferTests extends AnyFlatSpec {
 
     val buffer = createLinkedListBuffer(3);
     val e1, e2, e3, e4 = new SolarInstallation()
+    e2.fields("barf") = "penis"
 
     // Iterator should start empty
     { 
@@ -77,6 +78,15 @@ class LinkedListBufferTests extends AnyFlatSpec {
       assert(!iterator.hasNext)
     }
 
+    buffer.remove(e2)
+
+    // make sure remove displaces
+    {
+      val iterator = buffer.iterator
+      assert(iterator.hasNext)
+      assert(e3 === iterator.next())
+    }
+
   }
 
 //  "LinkedListBuffer" should "let me grab it's values" in {
@@ -96,6 +106,8 @@ class LinkedListBufferTests extends AnyFlatSpec {
     assert(li1._numStored === 1)
     assert(li1.append(1).isEmpty)
     assert(li1.append(2).isEmpty)
+    assert(li1._buffer(1)._prev === 0)
+    assert(li1._buffer(1)._next === 2)
     assert(li1._numStored === 3)
 
     // "append() past capacity size" should "properly adjust head and tail, and _numstored" in
@@ -103,6 +115,10 @@ class LinkedListBufferTests extends AnyFlatSpec {
     assert(li1._numStored === 3)
     assert(li1._head === 1)
     assert(li1._tail === 0)
+    assert(li1._buffer(li1._head).get === 1)
+    assert(li1._buffer(0)._prev === 2)
+    assert(li1._buffer(2)._next === 0)
+    assert(li1._buffer(li1._tail).get === 3)
 
     // "append()" should "not break for duplicates" in
     assert(li1.append(4) === Some(1))
@@ -114,23 +130,33 @@ class LinkedListBufferTests extends AnyFlatSpec {
     assert(li1._numStored === 3)
   }
 
-  "remove()" should "pass all requirements" in {
-    val li1 = new LinkedListBuffer[Int](3)
+  behavior of "remove()"
+  it should "pass all requirements" in {
+    val li1 = new LinkedListBuffer[Int](4)
     li1.append(0)
     li1.append(1)
     li1.append(0)
 
     // it should "return false if value not found & val doesn't change" in
-      assert(!li1.remove(3))
-      assert(li1._numStored === 3)
-      assert(li1._buffer(0).get === 0)
-      assert(li1._buffer(1).get === 1)
-      assert(li1._buffer(2).get === 0)
+    assert(!li1.remove(3))
+    assert(li1._numStored === 3)
+    assert(li1.apply(0) === 0)
+    assert(li1.apply(1) === 1)
+    assert(li1.apply(2) === 0)
+    assert(li1._buffer(0).get === 0)
+    assert(li1._buffer(1).get === 1)
+    assert(li1._buffer(2).get === 0)
 
     // it should "get rid of all instances of value" in
-      assert(li1.remove(0))
-      assert(li1._numStored === 1)
-      assert(li1._buffer(1).get === 1)
+    li1.append(-1)
+    assert(li1.remove(0))
+    assert(li1._numStored === 2)
+    assert(li1.apply(0) !== 0)
+    assert(li1.apply(3) !== 0)
+    assert(li1._buffer(1).get === 1)
+    assert(li1._buffer(1)._next === 3)
+    assert(li1._buffer(1)._prev !== 0)
+    assert(li1._buffer(3)._prev === 1)
 
 //      assert(li1.remove(0))
 //      assert(li1._buffer(1) === 1)
@@ -138,12 +164,21 @@ class LinkedListBufferTests extends AnyFlatSpec {
 //      assert(!li1.remove(0))
 //      assert(li1._numStored === 0)
 
-      assert(li1.remove(1))
-      assert(li1._numStored === 0)
-
+    assert(li1.remove(1))
+    assert(li1._buffer(1).get !== 1)
+    assert(li1._numStored === 1)
   }
 
-  "countEntry()" should "return the number of values" in {
+//  it should "not break when using Solar Whatever bc Idk whatelse to fix" in {
+//    val e1, e2 = new SolarInstallation()
+//    println(e1)
+//    println(e2)
+//    assert(e1 == e2)
+////    assert(e1 !== e2)
+//  }
+
+  behavior of "countEntry()"
+  it should "return the number of values" in {
     val li3 = new LinkedListBuffer[Char](5)
     li3.append('a')
     li3.append('c')
