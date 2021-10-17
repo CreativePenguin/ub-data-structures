@@ -88,26 +88,30 @@ class LinkedListBufferTests extends AnyFlatSpec {
   behavior of "append()"
   it should "pass all requirements" in {
     val li1 = new LinkedListBuffer[Int](3)
-
+      
     // "append()" should "return None (isEmpty), and increase in _numstored size" in
-      assert(li1.append(0).isEmpty)
-      assert(li1._numStored === 1)
-      assert(li1.append(1).isEmpty)
-      assert(li1.append(2).isEmpty)
-      assert(li1._numStored === 3)
+    assert(li1.append(0).isEmpty)
+    assert(li1._tail === 0)
+    assert(li1._buffer(li1._tail).get === 0)
+    assert(li1._numStored === 1)
+    assert(li1.append(1).isEmpty)
+    assert(li1.append(2).isEmpty)
+    assert(li1._numStored === 3)
 
     // "append() past capacity size" should "properly adjust head and tail, and _numstored" in
-      assert(li1.append(3) === Some(0))
-      assert(li1._numStored === 3)
-      assert(li1._head === 1)
-      assert(li1._tail === 0)
+    assert(li1.append(3) === Some(0))
+    assert(li1._numStored === 3)
+    assert(li1._head === 1)
+    assert(li1._tail === 0)
 
-//    "append()" should "not break for duplicates" in
-      assert(li1.append(4) === Some(1))
-      assert(li1.append(3) === Some(2))
-      assert(li1.append(3) === Some(3))
-      assert(li1._numStored === 3)
-
+    // "append()" should "not break for duplicates" in
+    assert(li1.append(4) === Some(1))
+    assert(li1._head === 2)
+    assert(li1._head === 1)
+    assert(li1.append(3) === Some(2))
+    assert(li1.append(3) === Some(3))
+    assert(li1._buffer(li1._tail).get === 3)
+    assert(li1._numStored === 3)
   }
 
   "remove()" should "pass all requirements" in {
