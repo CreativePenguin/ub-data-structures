@@ -96,9 +96,9 @@ class LinkedListBufferTests extends AnyFlatSpec {
 //  }
 
   behavior of "append()"
-  it should "pass all requirements" in {
+  it should "return None (isEmpty), and increase in _numstored size" in {
     val li1 = new LinkedListBuffer[Int](3)
-      
+
     // "append()" should "return None (isEmpty), and increase in _numstored size" in
     assert(li1.append(0).isEmpty)
     assert(li1._tail === 0)
@@ -109,7 +109,13 @@ class LinkedListBufferTests extends AnyFlatSpec {
     assert(li1._buffer(1)._prev === 0)
     assert(li1._buffer(1)._next === 2)
     assert(li1._numStored === 3)
+  }
 
+  it should "properly adjust values after appending past capacity" in {
+    val li1 = new LinkedListBuffer[Int](3)
+    li1.append(0)
+    li1.append(1)
+    li1.append(2)
     // "append() past capacity size" should "properly adjust head and tail, and _numstored" in
     assert(li1.append(3) === Some(0))
     assert(li1._numStored === 3)
@@ -153,9 +159,8 @@ class LinkedListBufferTests extends AnyFlatSpec {
     assert(li1._numStored === 2)
 //    assert(li1._buffer(0) !==)
     assertThrows[NoSuchElementException] {
-
-    assert(li1.apply(0) !== 0)
-    assert(li1.apply(3) !== 0)
+      assert(li1.apply(0) !== 0)
+      assert(li1.apply(3) !== 0)
     }
     assert(li1._buffer(1).get === 1)
     assert(li1._buffer(1)._next === 3)
@@ -247,6 +252,22 @@ class LinkedListBufferTests extends AnyFlatSpec {
     assert(li4.length === 5)
     li4.remove(false)
     assert(li4.length === 4)
+  }
+
+  "everything" should "work when you're randomly removing shit" in {
+    val li = new LinkedListBuffer[Int](3)
+    li.append(0)
+    li.append(1)
+    li.append(2)
+
+    li.append(2)
+    li.remove(1)
+    assert(!li.remove(0), "0 should already be gone")
+    assert(li.append(4).isEmpty, "program should know to append after 3")
+    assert(li.apply(2) === 4, "apply should get 2nd value, not _buffer(i)")
+    assert(li.append(2) === 1, "program should maintain head")
+    assert(li.remove(2))
+    assert(li.apply(0) === 1, "program should readjust after nuke")
   }
 
 }

@@ -44,7 +44,27 @@ class LinkedListBuffer[A](capacity: Int)
    * 
    * (assume that all times are non-amortized unless otherwise specified).
    */
-  def append(entry: A): Option[A] = ???
+  def append(entry: A): Option[A] = {
+    if(_numStored < capacity) {
+      _head = Math.max(0, _head)
+      _tail = _tail + 1
+      _buffer(_tail).set(entry)
+      if(_numStored != 0) {
+        _buffer(_tail )._next = _tail
+        _buffer(_tail)._prev = _tail - 1
+      }
+      _numStored += 1
+      None
+    } else {
+      val newtail = _buffer(_head)
+      _buffer(_tail)._next = _head
+      newtail.set(entry)
+      newtail._prev = _tail
+      _head = newtail._next
+      _tail = _head
+      Some(newtail.get)
+    }
+  }
 
   /**
    * Remove all instances of an element from the sequence.
@@ -57,7 +77,25 @@ class LinkedListBuffer[A](capacity: Int)
    * 
    * This function must run in O(n) time, where n = [[length]] 
    */
-  def remove(entry: A): Boolean = ???
+  def remove(entry: A): Boolean = {
+    var i = _head
+    var containsEntry = false
+    while(i != _tail) {
+      if(_buffer(i).get == entry) {
+        containsEntry = true
+        if(i == _head) _head = _buffer(_head)._next
+        if(i == _tail) _tail = _buffer(_tail)._prev
+        val prev = _buffer(_buffer(i)._prev)
+        val next = _buffer(_buffer(i)._next)
+        prev._next = _buffer(i)._next
+        next._prev = _buffer(i)._prev
+//        if(i + 1 < _numStored) _buffer(i + 1)._prev = i - 1
+        _numStored -= 1
+      }
+      i = _buffer(i)._next
+    }
+    containsEntry
+  }
   /**
    * Return the current length of the sequence
    * @return                The number of elements in the sequence
@@ -68,7 +106,7 @@ class LinkedListBuffer[A](capacity: Int)
    * 
    * This function must run in Θ(1) time.
    */
-  override def length: Int = ???
+  override def length: Int = _numStored
 
   /**
    * Retrieve the `idx`th element to be inserted into the sequence (i.e., the
@@ -80,7 +118,16 @@ class LinkedListBuffer[A](capacity: Int)
    * 
    * This function must run in O(n) time, where n = `idx`
    */
-  override def apply(idx: Int): A = ???
+  override def apply(idx: Int): A = {
+    if(idx > _numStored) {
+      throw new IndexOutOfBoundsException
+    }
+    var i = _head
+    for(j <- 0 until idx) {
+      i = _buffer(i)._next
+    }
+    _buffer(i).get
+  }
 
   /**
    * Count the number of times `entry` occurs in the sequence.
@@ -92,7 +139,17 @@ class LinkedListBuffer[A](capacity: Int)
    * 
    * This function must run in O(n) time, where n = [[length]] 
    */
-  def countEntry(entry: A): Int = ???
+  def countEntry(entry: A): Int = {
+    var i = _head
+    var count = 0
+    while(i != _tail) {
+      if(_buffer(i).get == entry) {
+        count += 1
+      }
+      i = _buffer(i)._next
+    }
+    count
+  }
 
   /**
    * Update the value at position `idx` to `elem`
