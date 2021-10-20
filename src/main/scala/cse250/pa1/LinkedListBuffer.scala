@@ -22,6 +22,7 @@ class LinkedListBuffer[A](capacity: Int)
   extends scala.collection.mutable.Seq[A]
 {
   val _buffer = Array.fill[LinkedListNode](capacity) { new LinkedListNode(None) }
+  val _removed = new FakeQueue(capacity)
   var _numStored = 0
   var _head = -1
   var _tail = -1
@@ -47,22 +48,31 @@ class LinkedListBuffer[A](capacity: Int)
   def append(entry: A): Option[A] = {
     if(_numStored < capacity) {
       _head = Math.max(0, _head)
-      _tail = _tail + 1
+      val prevtail = _tail
+      if(_removed.length > 0) {
+        _tail = _removed.dequeue()
+      } else {
+        _tail += 1
+      }
       _buffer(_tail).set(entry)
+      _buffer(_head)._prev = -1
+      _buffer(_tail)
       if(_numStored != 0) {
-        _buffer(_tail )._next = _tail
-        _buffer(_tail)._prev = _tail - 1
+        _buffer(prevtail)._next = _tail
+        _buffer(_tail)._prev = prevtail
       }
       _numStored += 1
       None
     } else {
-      val newtail = _buffer(_head)
+      val removedVal = _buffer(_head).get
       _buffer(_tail)._next = _head
-      newtail.set(entry)
-      newtail._prev = _tail
-      _head = newtail._next
+      _buffer(_head).set(entry)
+      _buffer(_head)._prev = _tail
       _tail = _head
-      Some(newtail.get)
+      _head = _buffer(_head)._next
+      _buffer(_head)._prev = -1
+      _buffer(_tail)._next = -1
+      Some(removedVal)
     }
   }
 
@@ -78,17 +88,26 @@ class LinkedListBuffer[A](capacity: Int)
    * This function must run in O(n) time, where n = [[length]] 
    */
   def remove(entry: A): Boolean = {
+    if(_numStored == 0) { return false }
     var i = _head
     var containsEntry = false
-    while(i != _tail) {
+    while(i != -1) {
       if(_buffer(i).get == entry) {
         containsEntry = true
-        if(i == _head) _head = _buffer(_head)._next
-        if(i == _tail) _tail = _buffer(_tail)._prev
-        val prev = _buffer(_buffer(i)._prev)
-        val next = _buffer(_buffer(i)._next)
-        prev._next = _buffer(i)._next
-        next._prev = _buffer(i)._prev
+        if(i == _head) {
+          _head = _buffer(_head)._next
+          if(_head != -1) { _buffer(_head)._prev = -1 }
+        } else if(i == _tail) {
+          _tail = _buffer(_tail)._prev
+          _buffer(_tail)._next = -1
+        } else {
+          val prev = _buffer(_buffer(i)._prev)
+          val next = _buffer(_buffer(i)._next)
+          prev._next = _buffer(i)._next
+          next._prev = _buffer(i)._prev
+        }
+        _buffer(i).clear
+        _removed.enqueue(i)
 //        if(i + 1 < _numStored) _buffer(i + 1)._prev = i - 1
         _numStored -= 1
       }
@@ -142,12 +161,15 @@ class LinkedListBuffer[A](capacity: Int)
   def countEntry(entry: A): Int = {
     var i = _head
     var count = 0
-    while(i != _tail) {
+    while(i != -1) {
       if(_buffer(i).get == entry) {
         count += 1
       }
       i = _buffer(i)._next
     }
+//    if(_buffer(i).get == entry) {
+//      count += 1
+//    }
     count
   }
 
@@ -165,6 +187,11 @@ class LinkedListBuffer[A](capacity: Int)
     if(idx < 0 || idx > _numStored - 1) {
       throw new IndexOutOfBoundsException
     }
+    var i = _head
+    for(j <- 0 until idx) {
+      i = _buffer(i)._next
+    }
+    _buffer(i).set(elem)
   }
 
   /**
@@ -186,7 +213,6 @@ class LinkedListBuffer[A](capacity: Int)
    */
   override def toString(): String = 
     iterator.map { "[" + _ + "]" }.mkString(" ↔ ")
-
 
   /**
    * One node of a linked list.
@@ -265,7 +291,35 @@ class LinkedListBuffer[A](capacity: Int)
      * This method must throw a [[NoSuchElementException]] if it is called
      * before [[next]] is called for the first time on this iterator.
      */
-    def remove(): Unit = ???
+    def remove(): Unit = {
+      if(_curr == _head) { throw new NoSuchElementException() }
+    }
   }
 
+  class FakeQueue(capacity: Int) {
+    val _buffer = Array.fill[Int](capacity) { -1 }
+    var _head = -1
+    var _tail = -1
+    var _numStored = 0
+
+    def enqueue(entry: Int): Unit = {
+      if(_numStored < capacity) {
+        _head = Math.max(0, _head)
+        _tail = (_tail + 1) % capacity
+        _buffer(_tail) = entry
+        _numStored += 1
+      } else {
+        throw new IndexOutOfBoundsException()
+      }
+    }
+
+    def dequeue(): Int = {
+      val prevhead = _head
+      _head = _head + 1
+      _numStored -= 1
+      _buffer(prevhead)
+    }
+
+    def length: Int = _numStored
+  }
 }
