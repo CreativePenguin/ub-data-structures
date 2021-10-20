@@ -56,7 +56,7 @@ class LinkedListBuffer[A](capacity: Int)
       }
       _buffer(_tail).set(entry)
       _buffer(_head)._prev = -1
-      _buffer(_tail)
+      _buffer(_tail)._next = -1
       if(_numStored != 0) {
         _buffer(prevtail)._next = _tail
         _buffer(_tail)._prev = prevtail
@@ -314,10 +314,14 @@ class LinkedListBuffer[A](capacity: Int)
     }
 
     def dequeue(): Int = {
-      val prevhead = _head
-      _head = _head + 1
-      _numStored -= 1
-      _buffer(prevhead)
+      if(_numStored > 0) {
+        val prevhead = _head
+        _head = _head + 1
+        _numStored -= 1
+        _buffer(prevhead)
+      } else {
+        throw new IndexOutOfBoundsException()
+      }
     }
 
     def length: Int = _numStored
