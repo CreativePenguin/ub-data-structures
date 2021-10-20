@@ -174,8 +174,7 @@ class LinkedListBufferTests extends AnyFlatSpec {
 //      assert(li1._numStored === 0)
 
     assert(li1.remove(1))
-//    assert(li1._buffer(1) !== 1)
-    assert(!li1._buffer(1).isSet)
+//    assert(!li1._buffer(1).isSet)
     assert(li1._numStored === 1)
   }
 
@@ -267,7 +266,7 @@ class LinkedListBufferTests extends AnyFlatSpec {
     assert(li.append(2) === Some(0))
     li.remove(1)
     assert(!li.remove(0), "0 should already be gone")
-    assert(li.append(4).isEmpty, "program should know to append after 3")
+    assert(li.append(4).isEmpty, s"${li.append(4)} program should know to append after 3")
     assert(li.apply(2) === 4, "apply should get 2nd value, not _buffer(i)")
     assert(li.append(2) === Some(2), "program should maintain head")
     assert(li.remove(2))
