@@ -84,7 +84,7 @@ class LinkedListBufferTests extends AnyFlatSpec {
     buffer2.append(e1)
     buffer2.append(e2)
     buffer2.append(e3)
-    
+
     buffer2.remove(e2)
 
     // make sure remove displaces

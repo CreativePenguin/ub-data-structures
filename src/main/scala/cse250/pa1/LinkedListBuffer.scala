@@ -94,27 +94,32 @@ class LinkedListBuffer[A](capacity: Int)
     while(i != -1) {
       if(_buffer(i).get == entry) {
         containsEntry = true
-        if(i == _head) {
-          _head = _buffer(_head)._next
-          if(_head != -1) { _buffer(_head)._prev = -1 }
-        } else if(i == _tail) {
-          _tail = _buffer(_tail)._prev
-          _buffer(_tail)._next = -1
-        } else {
-          val prev = _buffer(_buffer(i)._prev)
-          val next = _buffer(_buffer(i)._next)
-          prev._next = _buffer(i)._next
-          next._prev = _buffer(i)._prev
-        }
-        _buffer(i).clear
-        _removed.enqueue(i)
-//        if(i + 1 < _numStored) _buffer(i + 1)._prev = i - 1
-        _numStored -= 1
+        removeH(i)
       }
       i = _buffer(i)._next
     }
     containsEntry
   }
+
+  def removeH(i: Int): Unit = {
+    if(i == _head) {
+      _head = _buffer(_head)._next
+      if(_head != -1) { _buffer(_head)._prev = -1 }
+    } else if(i == _tail) {
+      _tail = _buffer(_tail)._prev
+      _buffer(_tail)._next = -1
+    } else {
+      val prev = _buffer(_buffer(i)._prev)
+      val next = _buffer(_buffer(i)._next)
+      prev._next = _buffer(i)._next
+      next._prev = _buffer(i)._prev
+    }
+    _buffer(i).clear
+    _removed.enqueue(i)
+    //        if(i + 1 < _numStored) _buffer(i + 1)._prev = i - 1
+    _numStored -= 1
+  }
+
   /**
    * Return the current length of the sequence
    * @return                The number of elements in the sequence
@@ -259,7 +264,7 @@ class LinkedListBuffer[A](capacity: Int)
    */
   class LinkedListIterator extends Iterator[A]
   {
-    var _curr = _head
+    var _curr = -2
 
     /**
      * Return true if there are additional elements in this iterator, or 
@@ -267,7 +272,9 @@ class LinkedListBuffer[A](capacity: Int)
      * @return        True if next() will return another element.
      * 
      */
-    override def hasNext: Boolean = { _curr > -1 }
+    override def hasNext: Boolean = {
+      _curr != -1 && _head != -1
+    }
 
     /**
      * Return the next element of the iterator, and advance the iterator to 
@@ -277,12 +284,15 @@ class LinkedListBuffer[A](capacity: Int)
      * This method may throw a [[NoSuchElementException]] if it is called
      * hasNext() returns false.
      */
-    override def next(): A = { 
+    override def next(): A = {
       if(_curr == -1){ throw new NoSuchElementException() }
-      
-      val currentElement = _buffer(_curr)
+      if(_curr == -2) {
+        _curr = _buffer(_head)._next
+        return _buffer(_head).get
+      }
+      val currentElement= _buffer(_curr)
       _curr = currentElement._next
-      return currentElement._value.get
+      currentElement._value.get
     }
 
     /**
@@ -292,7 +302,9 @@ class LinkedListBuffer[A](capacity: Int)
      * before [[next]] is called for the first time on this iterator.
      */
     def remove(): Unit = {
-      if(_curr == _head) { throw new NoSuchElementException() }
+      if(_curr >= 0) {
+        removeH(_curr)
+      }
     }
   }
 
