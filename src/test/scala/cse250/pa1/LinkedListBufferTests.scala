@@ -35,7 +35,7 @@ class LinkedListBufferTests extends AnyFlatSpec {
     e3.fields("CITY") = "cool"
 
     // Iterator should start empty
-    { 
+    {
       val iterator = buffer.iterator
       assert(!iterator.hasNext)
     }
@@ -94,7 +94,42 @@ class LinkedListBufferTests extends AnyFlatSpec {
       assert(e1 === iterator.next())
       assert(e3 === iterator.next())
     }
+  }
 
+  it should "iterate properly with remove" in {
+    val buffer2 = createLinkedListBuffer(3)
+    val e1, e2, e3= new SolarInstallation()
+    e1.fields("CITY") = "fuckhead"
+    e2.fields("CITY") = "penis"
+    e3.fields("CITY") = "cool"
+    buffer2.append(e1)
+    buffer2.append(e2)
+    buffer2.append(e3)
+
+    // make sure that remove displaces
+    {
+      val iterator = buffer2.iterator
+      assert(iterator.hasNext)
+      iterator.remove()
+      assert(iterator.next() === e1)
+      iterator.remove()
+
+      val iterator2 = buffer2.iterator
+      assert(iterator2.next() === e2)
+      assert(iterator2.next() === e3)
+      assert(!iterator2.hasNext, iterator2._curr)
+    }
+
+    //make sure that for loop works
+    {
+      var lastReached = false
+      for(i <- buffer2) {
+        if(i == e3) {
+          lastReached = true
+        }
+      }
+      assert(lastReached)
+    }
   }
 
 //  "LinkedListBuffer" should "let me grab it's values" in {

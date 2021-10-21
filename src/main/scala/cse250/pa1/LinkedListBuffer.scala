@@ -273,7 +273,8 @@ class LinkedListBuffer[A](capacity: Int)
      * 
      */
     override def hasNext: Boolean = {
-      _curr != -1 && _head != -1
+      if(_curr == -2){ _head != -1 }
+      else{ _buffer(_curr)._next != -1 }
     }
 
     /**
@@ -287,12 +288,11 @@ class LinkedListBuffer[A](capacity: Int)
     override def next(): A = {
       if(_curr == -1){ throw new NoSuchElementException() }
       if(_curr == -2) {
-        _curr = _buffer(_head)._next
+        _curr = _head
         return _buffer(_head).get
       }
-      val currentElement= _buffer(_curr)
-      _curr = currentElement._next
-      currentElement._value.get
+      _curr = _buffer(_curr)._next
+      _buffer(_curr).get
     }
 
     /**
