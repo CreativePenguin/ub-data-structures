@@ -36,7 +36,14 @@ class LSMIndexTest extends AnyFlatSpec {
     lsm.insert(47, "bar")
     assert(lsm.contains(47))
     lsm.insert(3, "uber")
-    assert(lsm._buffer.length == 0)
+    lsm.insert(4, "dick")
+    lsm.insert(5, "fart")
+    lsm.insert(6, "drivel")
+    lsm.insert(7, "criminal")
+    lsm.insert(8, "corrupt")
+    lsm.insert(9, "mate")
+    assert(lsm._bufferElementsUsed === 9)
+//    assert(lsm._buffer.length === 0)
   }
   it should "Not fail contains" in {
     val lsm = lsmIndex
@@ -44,11 +51,6 @@ class LSMIndexTest extends AnyFlatSpec {
     assert(!lsm.contains(1))
     lsm.insert(1, "foo")
     assert(lsm.contains(1))
-  }
-  it should "promote properly" in {
-    val lsm = lsmIndex
-
-    lsm.insert(1, "foo")
   }
   it should "support apply()" in {
     val lsm = lsmIndex
@@ -66,8 +68,10 @@ class LSMIndexTest extends AnyFlatSpec {
 
     lsm.insert(1, "foo")
     lsm.promote(1, lsm._buffer.toIndexedSeq)
-    lsm.insert(2, "drug")
-    lsm.promote(1, lsm._buffer.toIndexedSeq)
+    assert(lsm._levels(1).isDefined)
+//    assert(lsm._bufferElementsUsed == 0)
+//    lsm.insert(2, "drug")
+//    lsm.promote(1, lsm._buffer.toIndexedSeq)
   }
   it should "MergedIterator next properly" in {
 
