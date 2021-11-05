@@ -55,7 +55,7 @@ class LSMIndex[K:Ordering, V <: AnyRef](_bufferSize: Int)(implicit ktag: ClassTa
   /**
    * Insert a key, value pair into the LSM Index.
    * @param    key      The key of the record to be inserted
-   * @param    valye    The value of the record to be inserted
+   * @param    value    The value of the record to be inserted
    * 
    * This function should run in ammortized O(log(n)) time
    */

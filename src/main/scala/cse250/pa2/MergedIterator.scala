@@ -47,7 +47,12 @@ class MergedIterator[A: Ordering](
    * head elements.  If either iterator is empty, return the next
    * of the other iterator.
    */
-  def next(): A = ???
+  def next(): A = {
+    val min = Ordering[A].min(lhs.head, rhs.head)
+    lhs.next()
+    rhs.next()
+    min
+  }
 }
 
 
