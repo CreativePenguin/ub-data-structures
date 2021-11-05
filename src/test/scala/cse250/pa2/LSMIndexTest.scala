@@ -20,7 +20,7 @@ package cse250.pa2
 
 import org.scalatest.flatspec.AnyFlatSpec
 
-class LSMIndexTests extends AnyFlatSpec {
+class LSMIndexTest extends AnyFlatSpec {
 
   def lsmIndex: LSMIndex[Int, String] =
     new LSMIndex(10)
