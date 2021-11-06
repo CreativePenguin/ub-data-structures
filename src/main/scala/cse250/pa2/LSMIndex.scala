@@ -81,7 +81,9 @@ class LSMIndex[K:Ordering, V <: AnyRef](_bufferSize: Int)(implicit ktag: ClassTa
    * @param  level          The level to install the sequence at
    * @param  layerContents  The sequence of elements to install at the layer
    */
-  def promote(level: Int, layerContents: IndexedSeq[(K, V)]): Unit = ???
+  def promote(level: Int, layerContents: IndexedSeq[(K, V)]): Unit = {
+
+  }
 
   /**
    * Determine if the provided key is present in the LSM index

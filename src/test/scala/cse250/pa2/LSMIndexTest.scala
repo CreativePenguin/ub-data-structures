@@ -60,8 +60,8 @@ class LSMIndexTest extends AnyFlatSpec {
     lsm.insert(1, "foo")
     lsm.insert(1, "bar")
     seq = lsmIndex.apply(1)
-//    assert(seq.contains("foo"))
-//    assert(seq.contains("bar"))
+    assert(lsmIndex.apply(1).contains("foo"))
+    assert(lsmIndex.apply(1).contains("bar"))
   }
   it should "support promote()" in {
     val lsm = lsmIndex
@@ -69,9 +69,9 @@ class LSMIndexTest extends AnyFlatSpec {
     lsm.insert(1, "foo")
     lsm.promote(1, lsm._buffer.toIndexedSeq)
     assert(lsm._levels(1).isDefined)
-//    assert(lsm._bufferElementsUsed == 0)
-//    lsm.insert(2, "drug")
-//    lsm.promote(1, lsm._buffer.toIndexedSeq)
+    assert(lsm._bufferElementsUsed == 0)
+    lsm.insert(2, "drug")
+    lsm.promote(1, lsm._buffer.toIndexedSeq)
   }
   it should "MergedIterator next properly" in {
 
