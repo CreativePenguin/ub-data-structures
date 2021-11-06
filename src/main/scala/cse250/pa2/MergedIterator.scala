@@ -49,8 +49,8 @@ class MergedIterator[A: Ordering](
    */
   def next(): A = {
     val min = Ordering[A].min(lhs.head, rhs.head) // use _ordering
-    lhs.next()
-    rhs.next()
+    this.lhs.next()
+    this.rhs.next()
     min
   }
 }

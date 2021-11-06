@@ -82,7 +82,11 @@ class LSMIndex[K:Ordering, V <: AnyRef](_bufferSize: Int)(implicit ktag: ClassTa
    * @param  layerContents  The sequence of elements to install at the layer
    */
   def promote(level: Int, layerContents: IndexedSeq[(K, V)]): Unit = {
+    if(_levels(level).isDefined) {
 
+    } else {
+      _levels(level) = Some(layerContents)
+    }
   }
 
   /**
