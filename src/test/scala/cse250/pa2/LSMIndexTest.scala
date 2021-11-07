@@ -43,6 +43,11 @@ class LSMIndexTest extends AnyFlatSpec {
     lsm.insert(8, "corrupt")
     lsm.insert(9, "mate")
     assert(lsm._bufferElementsUsed === 9)
+    for(i <- 0 until 100) {
+      lsm.insert(i + 100, i.toString)
+    }
+    assert(lsm._bufferElementsUsed < 100)
+    assert(lsm._levels(1).isDefined)
 //    assert(lsm._buffer.length === 0)
   }
   it should "Not fail contains" in {
@@ -59,13 +64,13 @@ class LSMIndexTest extends AnyFlatSpec {
     assert(!seq.contains("foo"))
     lsm.insert(1, "dooda")
     lsm.insert(1, "foo")
+    assert(!lsm.apply(1).contains("dooda"))
     lsm.promote(0, lsm._buffer.toIndexedSeq)
     seq = lsm.apply(1)
     assert(lsm.apply(1).contains("foo"))
     lsm.insert(1, "bar")
     assert(lsm.apply(1).contains("bar"))
     assert(lsm.apply(1).contains("foo"))
-    assert(!lsm.apply(1).contains("dooda"))
   }
   it should "support promote()" in {
     val lsm = lsmIndex

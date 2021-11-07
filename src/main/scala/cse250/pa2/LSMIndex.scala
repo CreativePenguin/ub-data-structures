@@ -83,7 +83,7 @@ class LSMIndex[K:Ordering, V <: AnyRef](_bufferSize: Int)(implicit ktag: ClassTa
    */
   def promote(level: Int, layerContents: IndexedSeq[(K, V)]): Unit = {
     if(_levels(level).isDefined) {
-
+      MergedIterator.merge(_levels(level), layerContents)(_ordering)
     } else {
       _levels(level) = Some(layerContents)
     }
