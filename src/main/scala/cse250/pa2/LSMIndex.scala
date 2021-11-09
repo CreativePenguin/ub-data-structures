@@ -84,9 +84,7 @@ class LSMIndex[K:Ordering, V <: AnyRef](_bufferSize: Int)(implicit ktag: ClassTa
    * @param  layerContents  The sequence of elements to install at the layer
    */
   def promote(level: Int, layerContents: IndexedSeq[(K, V)]): Unit = {
-    if(_levels.isEmpty) {
-      _levels.insert(0, None)
-    }
+    while(_levels.size < level) { _levels += None }
     _levels(level) match {
       case Some(li) =>
         val isOverflow = layerContents.length + li.length >= levelSize(level)
@@ -109,13 +107,21 @@ class LSMIndex[K:Ordering, V <: AnyRef](_bufferSize: Int)(implicit ktag: ClassTa
    * This function should run in O(log^2(n)) time
    */
   def contains(key: K): Boolean = {
-    for(i <- _levels.indices) {
+    for(i <- _buffer) {
+      if(i._1 == key) return true
+    }
+    for (i <- _levels.indices) {
       _levels(i) match {
         case Some(li) =>
-          val point = li.search((key, new V()))(_ordering).insertionPoint
-          if(li(point)._1 == key) return true
+//          val point = li.search((key, new V))(_ordering).insertionPoint
+          // li(0)._2 is random instance of type V, since V is ignored
+          val point = li.search((key, li(0)._2))(_ordering).insertionPoint
+          if(point >= li.size) return false
+          if (li(point)._1 == key) return true
+        case _ =>
+      }
     }
-    return false
+    false
   }
 
   /**
@@ -124,11 +130,10 @@ class LSMIndex[K:Ordering, V <: AnyRef](_bufferSize: Int)(implicit ktag: ClassTa
    * @param key same key as in apply()
    * @param seq current half of _level to search through
    */
-  @tailrec
-def applyH(key: K, seq: IndexedSeq[(K, V)]): Seq[V] = {
+  def applyH(key: K, seq: IndexedSeq[(K, V)]): Seq[V] = {
     if(seq.length == 1) {
-      if(seq(0)._1 == key) seq.map(x => x._2).toSeq
-      else Seq()
+      if(seq(0)._1 == key) { seq.map(x => x._2) }
+      else { Seq() }
     } else {
       val midComparison = Ordering[K].compare(key, seq(seq.length / 2)._1)
       if(midComparison < 0) {
@@ -163,10 +168,18 @@ def applyH(key: K, seq: IndexedSeq[(K, V)]): Seq[V] = {
    */
   def apply(key: K): Seq[V] = {
     var seq = Seq[V]()
+    for(i <- _buffer) {
+      if(i._1 == key) seq = seq :+ i._2
+    }
     for(i <- _levels) {
       i match {
         case Some(li) =>
-          seq = seq ++: applyH(key, li)
+//          seq = seq ++: applyH(key, li)
+          val point = li.search((key, li(0)._2))(_ordering).insertionPoint
+          if (li(point)._1 == key) {
+            seq = seq :+ li(point)._2
+          }
+        case _ =>
       }
     }
     seq
@@ -175,16 +188,20 @@ def applyH(key: K, seq: IndexedSeq[(K, V)]): Seq[V] = {
   /**
    * Generate a string representation of this LSM index
    */
-  override def toString: String = 
-    s"Buffer (${_bufferElementsUsed} elements): " + 
-  _buffer.take(_bufferElementsUsed).map { _._1 }.mkString(", ") + "\n" +
-    _levels.zipWithIndex
-           .map { case (level, i) => 
-              s"Level $i: " + (level match {
-                case None => "[Unused]"
-                case Some(contents) => contents.map { _._1 }.mkString(", ")
-              })
-            }
-           .mkString("\n")
-
+  override def toString: String = {
+    s"Buffer (${_bufferElementsUsed} elements): " +
+      _buffer.take(_bufferElementsUsed).map {
+        _._1
+      }.mkString(", ") + "\n" +
+      _levels.zipWithIndex
+        .map { case (level, i) =>
+          s"Level $i: " + (level match {
+            case None => "[Unused]"
+            case Some(contents) => contents.map {
+              _._1
+            }.mkString(", ")
+          })
+        }
+        .mkString("\n")
+  }
 }

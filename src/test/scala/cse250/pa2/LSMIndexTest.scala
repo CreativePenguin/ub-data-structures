@@ -23,7 +23,7 @@ import org.scalatest.flatspec.AnyFlatSpec
 class LSMIndexTest extends AnyFlatSpec {
 
   def lsmIndex: LSMIndex[Int, String] =
-    new LSMIndex(10)
+    new LSMIndex(100)
 
   behavior of "LSMIndex"
   it should "Support appends" in {
@@ -46,10 +46,15 @@ class LSMIndexTest extends AnyFlatSpec {
     }
     assert(lsm.contains(1))
     assert(lsm(1).head === "foo")
-    assert(!lsm.contains(199))
+    assert(lsm.contains(199))
     assert(lsm._bufferElementsUsed < 100)
-    assert(lsm._levels(1).isDefined)
-    assert(lsm._levels(1).size === 100)
+    assert(lsm._levels(0).isDefined)
+    assert(lsm._levels(0).get.length === 100, lsm._levels(0))
+    print(lsm)
+    for(i <- 0 until 100) {
+      lsm.insert(i + 200, i.toString)
+    }
+//    assert(lsm._levels.length === 2, lsm)
 //    assert(lsm._buffer.length === 0)
   }
   it should "Not fail contains" in {
@@ -61,14 +66,14 @@ class LSMIndexTest extends AnyFlatSpec {
   }
   it should "support apply()" in {
     val lsm = lsmIndex
-    var seq = lsm.apply(1)
+    var seq = lsm
 
-    assert(!seq.contains("foo"))
+    assert(!seq.contains(1))
     lsm.insert(1, "dooda")
     lsm.insert(1, "foo")
     assert(!lsm.apply(1).contains("dooda"))
     lsm.promote(0, lsm._buffer.toIndexedSeq)
-    seq = lsm.apply(1)
+//    seq = lsm.apply(1)
     assert(lsm.apply(1).contains("foo"))
     lsm.insert(1, "bar")
     assert(lsm.apply(1).contains("bar"))
