@@ -82,10 +82,21 @@ class LSMIndex[K:Ordering, V <: AnyRef](_bufferSize: Int)(implicit ktag: ClassTa
    * @param  layerContents  The sequence of elements to install at the layer
    */
   def promote(level: Int, layerContents: IndexedSeq[(K, V)]): Unit = {
-    if(_levels(level).isDefined) {
-      MergedIterator.merge(_levels(level), layerContents)(_ordering)
-    } else {
-      _levels(level) = Some(layerContents)
+    if(_levels.isEmpty) {
+      _levels.insert(0, None)
+    }
+    _levels(level) match {
+      case Some(li) =>
+        val isOverflow = layerContents.length + li.length >=
+          Math.pow(2, level) * _bufferSize
+//        val iter = MergedIterator.merge[K](
+//          layerContents.map(a => a._1), li.map(a => a._1))
+        val iter = MergedIterator.merge[(K, V)](layerContents, li)
+        if(isOverflow) {
+          _levels.insert(level, None)
+          promote(level + 1, iter)
+        } else { _levels.insert(level, Some(iter)) }
+      case _ => _levels.insert(level, Some(layerContents))
     }
   }
 
@@ -96,7 +107,21 @@ class LSMIndex[K:Ordering, V <: AnyRef](_bufferSize: Int)(implicit ktag: ClassTa
    * 
    * This function should run in O(log^2(n)) time
    */
-  def contains(key: K): Boolean = ???
+  def contains(key: K): Boolean = {
+    for(i <- _levels) {
+      i match {
+        case Some(li) =>
+          var j = 0
+          while(Ordering[K].compare(key, li(j)._1) < 0) {
+            if(Ordering[K].compare(key, li(j)._1) == 0) {
+              return true
+            }
+            j += 1
+          }
+      }
+    }
+    false
+  }
 
   /**
    * Retrieve the value associated with the provided key from the
@@ -107,7 +132,22 @@ class LSMIndex[K:Ordering, V <: AnyRef](_bufferSize: Int)(implicit ktag: ClassTa
    * 
    * This function should run in O(log^2(n)) time
    */
-  def apply(key: K): Seq[V] = ???
+  def apply(key: K): Seq[V] = {
+    var seq = Seq[V]()
+    for(i <- _levels) {
+      i match {
+        case Some(li) =>
+          var j = 0
+          while(Ordering[K].compare(key, li(j)._1) < 0) {
+            if(Ordering[K].compare(key, li(j)._1) == 0) {
+              seq = li(j)._2 +: seq
+            }
+            j += 1
+          }
+      }
+    }
+    seq
+  }
 
   /**
    * Generate a string representation of this LSM index

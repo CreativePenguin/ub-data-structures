@@ -30,13 +30,11 @@ class LSMIndexTest extends AnyFlatSpec {
     val lsm = lsmIndex
 
     lsm.insert(1, "foo")
-    assert(lsm.contains(1))
-    assert(lsm(1).head === "foo")
     assert(lsm._bufferElementsUsed === 1)
     lsm.insert(47, "bar")
-    assert(lsm.contains(47))
+//    assert(lsm.contains(47))
     lsm.insert(3, "uber")
-    lsm.insert(4, "dick")
+    lsm.insert(4, "butt")
     lsm.insert(5, "fart")
     lsm.insert(6, "drivel")
     lsm.insert(7, "criminal")
@@ -46,8 +44,12 @@ class LSMIndexTest extends AnyFlatSpec {
     for(i <- 0 until 100) {
       lsm.insert(i + 100, i.toString)
     }
+    assert(lsm.contains(1))
+    assert(lsm(1).head === "foo")
+    assert(!lsm.contains(199))
     assert(lsm._bufferElementsUsed < 100)
     assert(lsm._levels(1).isDefined)
+    assert(lsm._levels(1).size === 100)
 //    assert(lsm._buffer.length === 0)
   }
   it should "Not fail contains" in {
