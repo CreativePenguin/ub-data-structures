@@ -18,6 +18,7 @@
  */
 package cse250.pa2
 
+import scala.annotation.tailrec
 import scala.reflect.ClassTag
 import scala.util.Sorting
 import scala.collection.mutable
@@ -51,6 +52,7 @@ class LSMIndex[K:Ordering, V <: AnyRef](_bufferSize: Int)(implicit ktag: ClassTa
    */
   val _levels = mutable.ArrayBuffer[Option[IndexedSeq[(K,V)]]]()
 
+  def levelSize(level: Int): Int = (Math.pow(2, level) * _bufferSize).toInt
 
   /**
    * Insert a key, value pair into the LSM Index.
@@ -87,8 +89,7 @@ class LSMIndex[K:Ordering, V <: AnyRef](_bufferSize: Int)(implicit ktag: ClassTa
     }
     _levels(level) match {
       case Some(li) =>
-        val isOverflow = layerContents.length + li.length >=
-          Math.pow(2, level) * _bufferSize
+        val isOverflow = layerContents.length + li.length >= levelSize(level)
 //        val iter = MergedIterator.merge[K](
 //          layerContents.map(a => a._1), li.map(a => a._1))
         val iter = MergedIterator.merge[(K, V)](layerContents, li)
@@ -108,19 +109,47 @@ class LSMIndex[K:Ordering, V <: AnyRef](_bufferSize: Int)(implicit ktag: ClassTa
    * This function should run in O(log^2(n)) time
    */
   def contains(key: K): Boolean = {
-    for(i <- _levels) {
-      i match {
+    for(i <- _levels.indices) {
+      _levels(i) match {
         case Some(li) =>
-          var j = 0
-          while(Ordering[K].compare(key, li(j)._1) < 0) {
-            if(Ordering[K].compare(key, li(j)._1) == 0) {
-              return true
-            }
-            j += 1
-          }
+          val point = li.search((key, new V()))(_ordering).insertionPoint
+          if(li(point)._1 == key) return true
+    }
+    return false
+  }
+
+  /**
+   * Helper function to implement binary search in apply()
+ *
+   * @param key same key as in apply()
+   * @param seq current half of _level to search through
+   */
+  @tailrec
+def applyH(key: K, seq: IndexedSeq[(K, V)]): Seq[V] = {
+    if(seq.length == 1) {
+      if(seq(0)._1 == key) seq.map(x => x._2).toSeq
+      else Seq()
+    } else {
+      val midComparison = Ordering[K].compare(key, seq(seq.length / 2)._1)
+      if(midComparison < 0) {
+        applyH(key, seq.slice(0, seq.length / 2))
+      } else if (midComparison > 0) {
+        applyH(key, seq.slice(seq.length / 2, seq.length))
+      } else {
+        var i = seq.length / 2
+        var retVal = Seq[V]()
+        while(seq(i)._1 == key) {
+          retVal = seq(i)._2 +: retVal
+          i -= 1
+        }
+        i = seq.length / 2 + 1
+        while(seq(i)._1 == key) {
+          retVal = seq(i)._2 +: retVal
+          i += 1
+        }
+        retVal
       }
     }
-    false
   }
 
   /**
@@ -137,13 +166,7 @@ class LSMIndex[K:Ordering, V <: AnyRef](_bufferSize: Int)(implicit ktag: ClassTa
     for(i <- _levels) {
       i match {
         case Some(li) =>
-          var j = 0
-          while(Ordering[K].compare(key, li(j)._1) < 0) {
-            if(Ordering[K].compare(key, li(j)._1) == 0) {
-              seq = li(j)._2 +: seq
-            }
-            j += 1
-          }
+          seq = seq ++: applyH(key, li)
       }
     }
     seq
