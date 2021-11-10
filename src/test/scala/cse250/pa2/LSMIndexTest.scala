@@ -26,6 +26,12 @@ class LSMIndexTest extends AnyFlatSpec {
     new LSMIndex(100)
 
   behavior of "LSMIndex"
+  it should "have working levelSize" in {
+    val lsm = lsmIndex
+    assert(lsm.levelSize(0) === 100)
+    assert(lsm.levelSize(1) === 200)
+    assert(lsm.levelSize(4) === 1600)
+  }
   it should "Support appends" in {
     val lsm = lsmIndex
 
@@ -50,11 +56,24 @@ class LSMIndexTest extends AnyFlatSpec {
     assert(lsm._bufferElementsUsed < 100)
     assert(lsm._levels(0).isDefined)
     assert(lsm._levels(0).get.length === 100, lsm._levels(0))
-    print(lsm)
     for(i <- 0 until 100) {
       lsm.insert(i + 200, i.toString)
     }
-//    assert(lsm._levels.length === 2, lsm)
+    assert(lsm._levels(0).isEmpty)
+    assert(lsm._levels(1).isDefined)
+    assert(lsm._levels(1).get.length === 200)
+    assert(lsm._levels.length === 2, lsm)
+    var prev = lsm._levels(1).get(0)
+    for(i <- lsm._levels(1).get.slice(1, lsm.levelSize(1))) {
+      assert(lsm._ordering.compare(prev, i) <= 0)
+      prev = i
+    }
+    for(i <- 0 until 200) {
+      lsm.insert(i + 400, i.toString)
+    }
+    assert(lsm._levels(0).isEmpty)
+    assert(lsm._levels(1).isEmpty)
+    print(lsm)
 //    assert(lsm._buffer.length === 0)
   }
   it should "Not fail contains" in {
@@ -71,26 +90,26 @@ class LSMIndexTest extends AnyFlatSpec {
     assert(!seq.contains(1))
     lsm.insert(1, "dooda")
     lsm.insert(1, "foo")
-    assert(!lsm.apply(1).contains("dooda"))
-    lsm.promote(0, lsm._buffer.toIndexedSeq)
-//    seq = lsm.apply(1)
+    assert(lsm.apply(1).contains("dooda"))
     assert(lsm.apply(1).contains("foo"))
+//    lsm.promote(0, lsm._buffer.toIndexedSeq)
+//    seq = lsm.apply(1)
     lsm.insert(1, "bar")
     assert(lsm.apply(1).contains("bar"))
     assert(lsm.apply(1).contains("foo"))
   }
-  it should "support promote()" in {
-    val lsm = lsmIndex
-
-    lsm.insert(1, "foo")
-    lsm.promote(0, lsm._buffer.toIndexedSeq)
-    assert(lsm._levels(1).isDefined)
-    assert(lsm._bufferElementsUsed === 0)
-    lsm.insert(2, "drug")
-    lsm.promote(0, lsm._buffer.toIndexedSeq)
-  }
-  it should "MergedIterator next properly" in {
-
-  }
+//  it should "support promote()" in {
+//    val lsm = lsmIndex
+//
+//    lsm.insert(1, "foo")
+//    lsm.promote(0, lsm._buffer.toIndexedSeq)
+//    assert(lsm._levels(1).isDefined)
+//    assert(lsm._bufferElementsUsed === 0)
+//    lsm.insert(2, "drug")
+//    lsm.promote(0, lsm._buffer.toIndexedSeq)
+//  }
+//  it should "MergedIterator next properly" in {
+//
+//  }
 
 }

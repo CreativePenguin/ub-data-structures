@@ -84,7 +84,7 @@ class LSMIndex[K:Ordering, V <: AnyRef](_bufferSize: Int)(implicit ktag: ClassTa
    * @param  layerContents  The sequence of elements to install at the layer
    */
   def promote(level: Int, layerContents: IndexedSeq[(K, V)]): Unit = {
-    while(_levels.size < level) { _levels += None }
+    while(_levels.length <= level) { _levels += None }
     _levels(level) match {
       case Some(li) =>
         val isOverflow = layerContents.length + li.length >= levelSize(level)
@@ -92,10 +92,10 @@ class LSMIndex[K:Ordering, V <: AnyRef](_bufferSize: Int)(implicit ktag: ClassTa
 //          layerContents.map(a => a._1), li.map(a => a._1))
         val iter = MergedIterator.merge[(K, V)](layerContents, li)
         if(isOverflow) {
-          _levels.insert(level, None)
+          _levels(level) = None
           promote(level + 1, iter)
         } else { _levels.insert(level, Some(iter)) }
-      case _ => _levels.insert(level, Some(layerContents))
+      case _ => _levels(level) = Some(layerContents)
     }
   }
 
@@ -108,7 +108,8 @@ class LSMIndex[K:Ordering, V <: AnyRef](_bufferSize: Int)(implicit ktag: ClassTa
    */
   def contains(key: K): Boolean = {
     for(i <- _buffer) {
-      if(i._1 == key) return true
+      if(i == null) {}
+      else if(i._1 == key) return true
     }
     for (i <- _levels.indices) {
       _levels(i) match {
@@ -169,7 +170,8 @@ class LSMIndex[K:Ordering, V <: AnyRef](_bufferSize: Int)(implicit ktag: ClassTa
   def apply(key: K): Seq[V] = {
     var seq = Seq[V]()
     for(i <- _buffer) {
-      if(i._1 == key) seq = seq :+ i._2
+      if(i == null) {}
+      else if(i._1 == key) seq = seq :+ i._2
     }
     for(i <- _levels) {
       i match {
