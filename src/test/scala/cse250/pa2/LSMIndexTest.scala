@@ -26,12 +26,12 @@ class LSMIndexTest extends AnyFlatSpec {
     new LSMIndex(100)
 
   behavior of "LSMIndex"
-  it should "have working levelSize" in {
-    val lsm = lsmIndex
-    assert(lsm.levelSize(0) === 100)
-    assert(lsm.levelSize(1) === 200)
-    assert(lsm.levelSize(4) === 1600)
-  }
+//  it should "have working levelSize" in {
+//    val lsm = lsmIndex
+//    assert(lsm.levelSize(0) === 100)
+//    assert(lsm.levelSize(1) === 200)
+//    assert(lsm.levelSize(4) === 1600)
+//  }
   it should "Support appends" in {
     val lsm = lsmIndex
 
@@ -64,7 +64,7 @@ class LSMIndexTest extends AnyFlatSpec {
     assert(lsm._levels(1).get.length === 200)
     assert(lsm._levels.length === 2, lsm)
     var prev = lsm._levels(1).get(0)
-    for(i <- lsm._levels(1).get.slice(1, lsm.levelSize(1))) {
+    for(i <- lsm._levels(1).get.slice(1, 200)) {
       assert(lsm._ordering.compare(prev, i) <= 0)
       prev = i
     }
