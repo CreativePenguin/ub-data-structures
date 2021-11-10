@@ -116,9 +116,9 @@ class LSMIndex[K:Ordering, V <: AnyRef](_bufferSize: Int)(implicit ktag: ClassTa
         case Some(li) =>
 //          val point = li.search((key, new V))(_ordering).insertionPoint
           // li(0)._2 is random instance of type V, since V is ignored
-          val point = li.search((key, li(0)._2))(_ordering).insertionPoint
-          if(point >= li.size) return false
-          if (li(point)._1 == key) return true
+          val foundIdx = li.search((key, li(0)._2))(_ordering).insertionPoint
+          if(foundIdx >= li.size) return false
+          if (li(foundIdx)._1 == key) return true
         case _ =>
       }
     }

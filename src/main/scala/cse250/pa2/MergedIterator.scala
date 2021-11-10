@@ -52,6 +52,14 @@ class MergedIterator[A: Ordering](
 //    this.lhs.next()
 //    this.rhs.next()
     if(lhs.hasNext && rhs.hasNext) {
+//      if(Ordering[A].tryCompare(lhs.head, rhs.head).isDefined) {
+//        if(Ordering[A].compare(lhs.head, rhs.head) < 0)
+//          lhs.next()
+//        else
+//          rhs.next()
+//      } else {
+//        if(lhs.head.)
+//      }
       if(Ordering[A].compare(lhs.head, rhs.head) < 0)
         lhs.next()
       else

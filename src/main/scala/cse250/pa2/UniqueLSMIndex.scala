@@ -29,6 +29,14 @@ import scala.collection.mutable
 class UniqueLSMIndex[K:Ordering, V <: AnyRef](_bufferSize: Int)(implicit ktag: ClassTag[K], vtag: ClassTag[V])
 {
   implicit val _ordering = new Ordering[(K, Option[V])]{
+//    override def tryCompare(a: (K, Option[V]), b: (K, Option[V])): Option[Int] = {
+//      if(a._2.isEmpty || b._2.isEmpty) {
+//        None
+//      } else {
+//        Some(compare(a, b))
+//      }
+//    }
+
     def compare(a: (K, Option[V]), b: (K, Option[V])) =
       Ordering[K].compare(a._1, b._1)
   }
@@ -51,11 +59,12 @@ class UniqueLSMIndex[K:Ordering, V <: AnyRef](_bufferSize: Int)(implicit ktag: C
    */
   val _levels = mutable.ArrayBuffer[Option[IndexedSeq[(K,Option[V])]]]()
 
+  def levelSize(level: Int): Int = (Math.pow(2, level) * _bufferSize).toInt
 
   /**
    * Insert a key, value pair into the LSM Index.
    * @param    key      The key of the record to be inserted
-   * @param    valye    The value of the record to be inserted
+   * @param    value    The value of the record to be inserted
    * 
    * This function should run in ammortized O(log(n)+B) time
    */
@@ -94,14 +103,52 @@ class UniqueLSMIndex[K:Ordering, V <: AnyRef](_bufferSize: Int)(implicit ktag: C
    * 
    * This function should run in ammortized O(log(n)+B) time
    */
-  def delete(key: K): Unit = ???
+  def delete(key: K): Unit = {
+    for(i <- _buffer.indices) {
+      if(_buffer(i)._1 == key) {
+        _bufferElementsUsed -= 1
+        _buffer(i) = _buffer(_bufferElementsUsed)
+        return
+      }
+    }
+    for(i <- _levels.indices) {
+      _levels(i) match {
+        case Some(li) =>
+          val foundIdx: Int = li.search((key, None))(_ordering).insertionPoint
+          if (li(foundIdx)._1 == key) {
+            if (li.length - 1 == foundIdx) {
+              _levels(i) = Some(li.slice(0, foundIdx))
+            } else {
+              _levels(i) = Some(li.slice(0, foundIdx) ++:
+                li.slice(foundIdx + 1, li.length))
+            }
+            return
+          }
+        case _ =>
+      }
+    }
+  }
 
   /**
    * Install a new sequence at the specified level
    * @param  level          The level to install the sequence at
    * @param  layerContents  The sequence of elements to install
    */
-  def promote(level: Int, layerContents: IndexedSeq[(K, Option[V])]): Unit = ???
+  def promote(level: Int, layerContents: IndexedSeq[(K, Option[V])]): Unit = {
+    while(_levels.length <= level) { _levels += None }
+    _levels(level) match {
+      case Some(li) =>
+        val isOverflow = layerContents.length + li.length >= levelSize(level)
+        //        val iter = MergedIterator.merge[K](
+        //          layerContents.map(a => a._1), li.map(a => a._1))
+        val iter = MergedIterator.merge[(K, Option[V])](layerContents, li)
+        if(isOverflow) {
+          _levels(level) = None
+          promote(level + 1, iter)
+        } else { _levels.insert(level, Some(iter)) }
+      case _ => _levels(level) = Some(layerContents)
+    }
+  }
 
   /**
    * Determine if the provided key is present in the LSM index
