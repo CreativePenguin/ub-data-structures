@@ -177,10 +177,18 @@ class LSMIndex[K:Ordering, V <: AnyRef](_bufferSize: Int)(implicit ktag: ClassTa
       i match {
         case Some(li) =>
 //          seq = seq ++: applyH(key, li)
-          val point = li.search((key, li(0)._2))(_ordering).insertionPoint
-          if (li(point)._1 == key) {
-            seq = seq :+ li(point)._2
+          var foundIdx = li.search((key, li(0)._2))(_ordering).insertionPoint
+          while(foundIdx < li.length) {
+            if(li(foundIdx)._1 == key) {
+              seq = seq :+ li(foundIdx)._2
+              foundIdx += 1
+            } else {
+              foundIdx = li.length
+            }
           }
+//          if (li(foundIdx)._1 == key) {
+//            seq = seq :+ li(foundIdx)._2
+//          }
         case _ =>
       }
     }

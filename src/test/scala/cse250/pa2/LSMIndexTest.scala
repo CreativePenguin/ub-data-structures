@@ -48,10 +48,14 @@ class LSMIndexTest extends AnyFlatSpec {
     lsm.insert(9, "mate")
     assert(lsm._bufferElementsUsed === 9)
     for(i <- 0 until 100) {
-      lsm.insert(i + 100, i.toString)
+      lsm.insert(i, i.toString)
     }
     assert(lsm.contains(1))
-    assert(lsm(1).head === "foo")
+    assert(lsm.apply(1).contains("1"))
+//    assert(lsm.apply(1).contains("foo"), lsm.apply(1))
+    print(lsm)
+//    print(lsm)
+//    assert(lsm(1).head === "foo", lsm)
     assert(lsm.contains(199))
     assert(lsm._bufferElementsUsed < 100)
     assert(lsm._levels(0).isDefined)
@@ -73,7 +77,8 @@ class LSMIndexTest extends AnyFlatSpec {
     }
     assert(lsm._levels(0).isEmpty)
     assert(lsm._levels(1).isEmpty)
-    print(lsm)
+    assert(lsm.apply(410).contains("10"))
+//    print(lsm)
 //    assert(lsm._buffer.length === 0)
   }
   it should "Not fail contains" in {
