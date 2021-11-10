@@ -107,9 +107,9 @@ class LSMIndex[K:Ordering, V <: AnyRef](_bufferSize: Int)(implicit ktag: ClassTa
    * This function should run in O(log^2(n)) time
    */
   def contains(key: K): Boolean = {
-    for(i <- _buffer) {
-      if(i == null) {}
-      else if(i._1 == key) return true
+    for(i <- 0 until _bufferElementsUsed) {
+      if(_buffer(i) == null) {}
+      else if(_buffer(i)._1 == key) return true
     }
     for (i <- _levels.indices) {
       _levels(i) match {
@@ -117,8 +117,8 @@ class LSMIndex[K:Ordering, V <: AnyRef](_bufferSize: Int)(implicit ktag: ClassTa
 //          val point = li.search((key, new V))(_ordering).insertionPoint
           // li(0)._2 is random instance of type V, since V is ignored
           val foundIdx = li.search((key, li(0)._2))(_ordering).insertionPoint
-          if(foundIdx >= li.size) return false
-          if (li(foundIdx)._1 == key) return true
+          if(foundIdx >= li.size) {}
+          else if (li(foundIdx)._1 == key) return true
         case _ =>
       }
     }
@@ -177,15 +177,23 @@ class LSMIndex[K:Ordering, V <: AnyRef](_bufferSize: Int)(implicit ktag: ClassTa
       i match {
         case Some(li) =>
 //          seq = seq ++: applyH(key, li)
-          var foundIdx = li.search((key, li(0)._2))(_ordering).insertionPoint
-          while(foundIdx < li.length) {
-            if(li(foundIdx)._1 == key) {
-              seq = seq :+ li(foundIdx)._2
-              foundIdx += 1
-            } else {
-              foundIdx = li.length
+          val foundIdx = li.search((key, li(0)._2))(_ordering).insertionPoint
+          var foundIdxCpy = foundIdx
+          // Check surrounding vars for duplicates
+          try {
+            while(li(foundIdxCpy)._1 == key) {
+              seq = seq :+ li(foundIdxCpy)._2
+              foundIdxCpy -= 1
             }
+            foundIdxCpy = foundIdx + 1
+            while(li(foundIdxCpy)._1 == key) {
+              seq = seq :+ li(foundIdxCpy)._2
+              foundIdxCpy += 1
+            }
+          } catch {
+            case e: IndexOutOfBoundsException =>
           }
+
 //          if (li(foundIdx)._1 == key) {
 //            seq = seq :+ li(foundIdx)._2
 //          }

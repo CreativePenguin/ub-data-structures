@@ -50,13 +50,15 @@ class LSMIndexTest extends AnyFlatSpec {
     for(i <- 0 until 100) {
       lsm.insert(i, i.toString)
     }
+    assert(lsm.contains(45))
     assert(lsm.contains(1))
     assert(lsm.apply(1).contains("1"))
-//    assert(lsm.apply(1).contains("foo"), lsm.apply(1))
-    print(lsm)
+    assert(lsm.apply(1).contains("foo"), lsm.apply(1))
+//    print(lsm)
 //    print(lsm)
 //    assert(lsm(1).head === "foo", lsm)
-    assert(lsm.contains(199))
+    assert(lsm.contains(99))
+    assert(!lsm.contains(199))
     assert(lsm._bufferElementsUsed < 100)
     assert(lsm._levels(0).isDefined)
     assert(lsm._levels(0).get.length === 100, lsm._levels(0))
