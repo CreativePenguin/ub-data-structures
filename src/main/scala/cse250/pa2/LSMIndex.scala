@@ -94,7 +94,7 @@ class LSMIndex[K:Ordering, V <: AnyRef](_bufferSize: Int)(implicit ktag: ClassTa
         if(isOverflow) {
           _levels(level) = None
           promote(level + 1, iter)
-        } else { _levels.insert(level, Some(iter)) }
+        } else { _levels(level) = Some(iter) }
       case _ => _levels(level) = Some(layerContents)
     }
   }
