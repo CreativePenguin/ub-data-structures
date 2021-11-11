@@ -164,7 +164,8 @@ class UniqueLSMIndex[K:Ordering, V <: AnyRef](_bufferSize: Int)(implicit ktag: C
         val isOverflow = layerContents.length + li.length >= levelSize(level)
         //        val iter = MergedIterator.merge[K](
         //          layerContents.map(a => a._1), li.map(a => a._1))
-        val iter = UniqueMergedIterator.merge[(K, Option[V])](layerContents, li)
+        val iter = UniqueMergedIterator.merge(layerContents, li)(_ordering)
+//        val iter = UniqueMergedIterator.merge[(K, Option[V])](layerContents, li)
         if(isOverflow) {
           _levels(level) = None
           promote(level + 1, iter)

@@ -11,13 +11,11 @@ class UniqueMergedIterator[A: Ordering](lhs: BufferedIterator[A], rhs: BufferedI
   def next(): A = {
     if (lhs.hasNext && rhs.hasNext) {
       val comparison = Ordering[A].compare(lhs.head, rhs.head)
-      if(comparison == math.abs(2)) {
+      if(math.abs(comparison) == 2) {
         if(comparison == -2) {
-          rhs.next()
           rhs.next()
           lhs.next()
         } else {
-          lhs.next()
           lhs.next()
           rhs.next()
         }
@@ -42,5 +40,5 @@ object UniqueMergedIterator
    * into a new sorted, indexed sequence.
    */
   def merge[A: Ordering](lhs: IterableOnce[A], rhs: IterableOnce[A]): IndexedSeq[A] =
-    new MergedIterator(lhs.iterator, rhs.iterator).toIndexedSeq
+    new UniqueMergedIterator(lhs.iterator, rhs.iterator).toIndexedSeq
 }

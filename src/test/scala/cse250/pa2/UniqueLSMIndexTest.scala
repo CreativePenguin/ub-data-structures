@@ -30,4 +30,18 @@ class UniqueLSMIndexTest extends AnyFlatSpec {
     assert(lsm.apply(7).isEmpty)
     assert(!lsm.contains(7))
   }
+
+  // These tests fail because it's not even using my instance of _ordering
+  behavior of "UniqueMergedIterator"
+  it should "next() correctly" in {
+    val blah = IndexedSeq((1, Some("1")), (2, None))
+    val june = IndexedSeq((1, Some("4")), (2, Some("3")), (3, Some("3")))
+//    val babylon =
+//      UniqueMergedIterator.merge[(Int, Option[String])](blah, june)
+    val babylon = UniqueMergedIterator.merge(blah, june)(lsmIndex._ordering)
+    assert(babylon.contains((1, Some("1"))))
+    assert(!babylon.contains((1, Some("4"))))
+    assert(babylon.contains((3, Some("3"))))
+    println(babylon)
+  }
 }
