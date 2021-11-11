@@ -219,6 +219,7 @@ class UniqueLSMIndex[K:Ordering, V <: AnyRef](_bufferSize: Int)(implicit ktag: C
         if(_buffer(i)._2.isEmpty) {
           return Seq[V]()
         }
+        return Seq[V](_buffer(i)._2.get)
       }
     }
     for(i <- _levels.indices) {
@@ -238,6 +239,7 @@ class UniqueLSMIndex[K:Ordering, V <: AnyRef](_bufferSize: Int)(implicit ktag: C
           } catch {
             case e: IndexOutOfBoundsException =>
           }
+        case _ =>
       }
       if (seq.isDefined) return seq.get
     }

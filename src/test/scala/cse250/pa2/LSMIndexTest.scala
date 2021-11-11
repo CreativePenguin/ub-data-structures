@@ -10,8 +10,8 @@
  * http://creativecommons.org/licenses/by-nc-sa/4.0/.
  *
  * Submission author
- * UBIT:
- * Person#:
+ * UBIT: Winston Peng
+ * Person#: 5038646
  *
  * Collaborators (include UBIT name of each, comma separated):
  * UBIT:
