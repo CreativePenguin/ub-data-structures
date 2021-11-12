@@ -38,10 +38,11 @@ class UniqueLSMIndex[K:Ordering, V <: AnyRef](_bufferSize: Int)(implicit ktag: C
 //    }
 
     def compare(a: (K, Option[V]), b: (K, Option[V])) = {
-      if((a._2.isEmpty || b._2.isEmpty) &&
-        Ordering[K].compare(a._1, b._1) == 0) {
-        if(a._2.isEmpty) -2 else 2
-      } else Ordering[K].compare(a._1, b._1)
+//      if((a._2.isEmpty || b._2.isEmpty) &&
+//        Ordering[K].compare(a._1, b._1) == 0) {
+//        if(a._2.isEmpty)
+//      } else Ordering[K].compare(a._1, b._1)
+      Ordering[K].compare(a._1, b._1)
     }
   }
 
@@ -131,6 +132,7 @@ class UniqueLSMIndex[K:Ordering, V <: AnyRef](_bufferSize: Int)(implicit ktag: C
 //        case _ =>
 //      }
 //    }
+
   // Check to see if the key is already present in the
   // buffer
   val oldIdx = _buffer.take(_bufferElementsUsed)
@@ -150,6 +152,7 @@ class UniqueLSMIndex[K:Ordering, V <: AnyRef](_bufferSize: Int)(implicit ktag: C
       promote(0, _buffer.toIndexedSeq)
       _bufferElementsUsed = 0
     }
+//    insert(key, None)
   }
 
   /**
@@ -164,7 +167,7 @@ class UniqueLSMIndex[K:Ordering, V <: AnyRef](_bufferSize: Int)(implicit ktag: C
         val isOverflow = layerContents.length + li.length >= levelSize(level)
         //        val iter = MergedIterator.merge[K](
         //          layerContents.map(a => a._1), li.map(a => a._1))
-        val iter = UniqueMergedIterator.merge(layerContents, li)(_ordering)
+        val iter = MergedIterator.merge(layerContents, li)(_ordering)
 //        val iter = UniqueMergedIterator.merge[(K, Option[V])](layerContents, li)
         if(isOverflow) {
           _levels(level) = None
@@ -193,10 +196,20 @@ class UniqueLSMIndex[K:Ordering, V <: AnyRef](_bufferSize: Int)(implicit ktag: C
         case Some(li) =>
           //          val point = li.search((key, new V))(_ordering).insertionPoint
           // li(0)._2 is random instance of type V, since V is ignored
-          val foundIdx = li.search((key, li(0)._2))(_ordering).insertionPoint
+          var foundIdx = li.search((key, li(0)._2))(_ordering).insertionPoint
           if (foundIdx >= li.size) {}
           else if (li(foundIdx)._1 == key && li(foundIdx)._2.isDefined)
             return true
+          var isEmptyFirst: Option[Boolean] = None
+          while (li(foundIdx)._1 == key && li(foundIdx)._2.isEmpty) {
+            isEmptyFirst = Some(false)
+            foundIdx -= 1
+            if (li(foundIdx)._1 == key && li(foundIdx)._2.isDefined) {
+              return true
+            }
+          }
+          if(isEmptyFirst.isDefined)
+            return isEmptyFirst.get
         case _ =>
       }
     }
@@ -235,7 +248,7 @@ class UniqueLSMIndex[K:Ordering, V <: AnyRef](_bufferSize: Int)(implicit ktag: C
               } else if (li(foundIdx)._1 == key && li(foundIdx)._2.isDefined) {
                 seq = Some(Seq[V](li(foundIdx)._2.get))
               }
-              foundIdx += 1
+              foundIdx -= 1
             }
           } catch {
             case e: IndexOutOfBoundsException =>

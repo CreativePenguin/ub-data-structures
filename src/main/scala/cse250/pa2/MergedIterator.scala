@@ -60,7 +60,7 @@ class MergedIterator[A: Ordering](
 //      } else {
 //        if(lhs.head.)
 //      }
-      if(Ordering[A].compare(lhs.head, rhs.head) < 0)
+      if(Ordering[A].compare(lhs.head, rhs.head) <= 0)
         lhs.next()
       else
         rhs.next()
