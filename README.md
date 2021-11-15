@@ -84,7 +84,7 @@ git clone microbase@odin.cse.buffalo.edu:YOUR_UBIT.git
 2. Update your repository to include materials for PA2 as follows.  From your 
 source directory, run the following commands at the command line.
 ```bash
-git remote add project-2 https://gitlab.odin.cse.buffalo.edu/cse-250/project-2.git
+git remote add project-2 git@github.com:UBOdin/cse-250-pa-sortedsequences.git
 git fetch project-2
 git merge project-2/main
 ```
