@@ -1,9 +1,7 @@
-package cse250.objects
 /**
- * cse250.objects.SolarInstallation.scala
+ * cse250.objects.HealthRecord.scala
  *
- * Copyright 2021 Oliver Kennedy (okennedy@buffalo.edu)
- *           2021 Andrew Hughes (ahughes6@buffalo.edu)
+ * Copyright 2021 Andrew Hughes (ahughes6@buffalo.edu)
  *
  * This work is licensed under the Creative Commons
  * Attribution-NonCommercial-ShareAlike 4.0 International License.
@@ -11,6 +9,7 @@ package cse250.objects
  * http://creativecommons.org/licenses/by-nc-sa/4.0/.
  *
  */
+package cse250.objects
 
 import scala.collection.mutable
 
