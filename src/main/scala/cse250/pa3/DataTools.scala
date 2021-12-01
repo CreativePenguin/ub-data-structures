@@ -68,12 +68,12 @@ object DataTools {
   def loadHealthRecords(filename: File): Seq[HealthRecord] = {
     val filebuf = Source.fromFile(filename)
     filebuf.getLines.next()
-    val seq: Seq[HealthRecord] = Seq()
+    var seq: Seq[HealthRecord] = Seq()
     for(line <- filebuf.getLines) {
       val cols = line.split(",")
 //      val cols = line.split(",").map(a => if(a == "Yes" || a == "No") a == "Yes" else a)
       val date = parseDate(cols(0))
-      seq :+ HealthRecord(date, cols(1), cols(2) == "Yes", cols(3) == "Yes",
+      seq = seq :+ HealthRecord(date, cols(1), cols(2) == "Yes", cols(3) == "Yes",
         cols(4) == "Yes", cols(5) == "Yes")
     }
     filebuf.close()
@@ -100,13 +100,13 @@ object DataTools {
   def loadVoterRecords(filename: File): Seq[VoterRecord] = {
     val filebuf = Source.fromFile(filename)
     filebuf.getLines.next()
-    val seq: Seq[VoterRecord] = Seq()
+    var seq: Seq[VoterRecord] = Seq()
     for(line <- filebuf.getLines) {
       val col: Array[String] = line.split(",")
 //      val date = DateFormat.getDateInstance(DateFormat.SHORT).parse(col(2))
 //      val date = col(2).split("/")
-      val date = parseDate(col(3))
-      seq :+ VoterRecord(col(0), col(1), date, col(3))
+      val date = parseDate(col(2))
+      seq = seq :+ VoterRecord(col(0), col(1), date, col(3))
     }
     filebuf.close()
     seq
