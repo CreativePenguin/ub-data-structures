@@ -21,7 +21,7 @@
  import cse250.objects._
 
  import java.io.File
- import java.util.{Date, GregorianCalendar, NoSuchElementException}
+ import java.util.{Date, GregorianCalendar}
  import scala.collection.mutable
  import scala.io.Source
 
@@ -67,9 +67,9 @@
     val filebuf = Source.fromFile(filename)
     filebuf.getLines.next()
     var seq: Seq[HealthRecord] = Seq()
-    for(line <- filebuf.getLines) {
+    for (line <- filebuf.getLines) {
       val cols = line.split(",")
-//      val cols = line.split(",").map(a => if(a == "Yes" || a == "No") a == "Yes" else a)
+      //      val cols = line.split(",").map(a => if(a == "Yes" || a == "No") a == "Yes" else a)
       val date = parseDate(cols(0))
       seq = seq :+ HealthRecord(date, cols(1), cols(2) == "Yes", cols(3) == "Yes",
         cols(4) == "Yes", cols(5) == "Yes")
@@ -100,10 +100,10 @@
     val filebuf = Source.fromFile(filename)
     filebuf.getLines.next()
     var seq: Seq[VoterRecord] = Seq()
-    for(line <- filebuf.getLines) {
+    for (line <- filebuf.getLines) {
       val col: Array[String] = line.split(",")
-//      val date = DateFormat.getDateInstance(DateFormat.SHORT).parse(col(2))
-//      val date = col(2).split("/")
+      //      val date = DateFormat.getDateInstance(DateFormat.SHORT).parse(col(2))
+      //      val date = col(2).split("/")
       val date = parseDate(col(2))
       seq = seq :+ VoterRecord(col(0), col(1), date, col(3))
     }
@@ -136,13 +136,12 @@
                      ): mutable.Map[String, HealthRecord] = {
     val healthMap: Map[(Date, String), HealthRecord] = healthRecords
       .map(a => ((a.m_Birthday, a.m_ZipCode), a)).toMap
-    val identifyMap: mutable.Map[String, HealthRecord] = mutable.Map()
+    val identifyMap: mutable.Map[String, HealthRecord] = mutable.HashMap()
     for (voter <- voterRecords) {
-      try {
+      val key = (voter.m_Birthday, voter.m_ZipCode)
+      if (healthMap.contains(key)) {
         identifyMap(voter.fullName) =
-          healthMap((voter.m_Birthday, voter.m_ZipCode))
-      } catch {
-        case e: NoSuchElementException =>
+          healthMap(key)
       }
     }
     identifyMap
