@@ -11,11 +11,10 @@
  */
 package cse250.pa3
 
+import cse250.objects.{HealthRecordBirthday, HealthRecordZipCode}
 import org.scalatest.flatspec.AnyFlatSpec
-import cse250.objects.{ HealthRecord, VoterRecord }
+
 import java.io.File
-import cse250.objects.HealthRecordZipCode
-import cse250.objects.HealthRecordBirthday
 
 /**
  * These tests are provided **to get you started**.  Passing these tests
@@ -66,8 +65,7 @@ class DataToolsTests extends AnyFlatSpec
     assert(records.map { _.m_FirstName} contains "DEWEY")
   }
 
-  "identifyPersons" must "Identify Persons" in 
-  {
+  "identifyPersons" must "Identify Persons" in {
     val health = DataTools.loadHealthRecords(
       new File("src/test/resources/Health-Records-10.csv")
     )
