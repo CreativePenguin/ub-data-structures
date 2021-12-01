@@ -26,6 +26,7 @@ import java.util.Date
 
 import scala.io.Source
 import scala.collection.mutable
+import java.util.GregorianCalendar
 
 object DataTools {
   /**
@@ -34,7 +35,15 @@ object DataTools {
    * @return                  A [[Date]] encoding dateString
    */
   def parseDate(dateString: String): Date = 
-    DateFormat.getDateInstance(DateFormat.SHORT).parse(dateString)
+  {
+    val dateParts = dateString.split(" ")(0).split("/")
+    assert(dateParts.size == 3, s"'$dateString' is not a valid date string")
+    new GregorianCalendar(
+      dateParts(2).toInt,   // YYYY
+      dateParts(0).toInt,   // MM
+      dateParts(1).toInt    // DD
+    ).getTime
+  }
 
 
   /**
