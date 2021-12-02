@@ -37,20 +37,27 @@
      assert(dateParts.size == 3, s"'$dateString' is not a valid date string")
      new GregorianCalendar(
        dateParts(2).toInt, // YYYY
-       dateParts(0).toInt, // MM
+       dateParts(0).toInt - 1, // MM
        dateParts(1).toInt // DD
      ).getTime
    }
 
+   def formatDate(date: Date): String = {
+     //     val str = new SimpleDateFormat("MM/dd/yyyy").format(date)
+     //     if (str.length <= 9) "0" + str else str
+     //     new SimpleDateFormat("MM/dd/yyyy").format(date)
+     date.toString
+   }
 
-  /**
-   * Load a sequence of "anonymized" [[HealthRecord]]s from a CSV file
-   *
-   * @param    filename    The path to a CSV file.
-   * @return The [[HealthRecord]] objects loaded from the file.
-   *
-   *         This function should make the following assumptions about the CSV file:
-   *         1. The first line of the CSV file is a header.
+
+   /**
+    * Load a sequence of "anonymized" [[HealthRecord]]s from a CSV file
+    *
+    * @param filename The path to a CSV file.
+    * @return The [[HealthRecord]] objects loaded from the file.
+    *
+    *         This function should make the following assumptions about the CSV file:
+    *         1. The first line of the CSV file is a header.
    *         2. Header fields are
    *         * "Birthday"
    *         * "Zip Code"
@@ -165,9 +172,31 @@
     *         `m_ZipCode` field.
     *
     *         This function **must** run in O(healthRecords.size)
-   */
-  def computeHealthRecordDist(
-                               records: Seq[HealthRecord],
-                               attribute: HealthRecordAttribute
-  ): mutable.Map[String, Double] = ???
+    */
+   def computeHealthRecordDist(
+                                records: Seq[HealthRecord],
+                                attribute: HealthRecordAttribute
+                              ): mutable.Map[String, Double] = {
+     val map: mutable.Map[String, Double] = mutable.Map()
+     val recordAttributes: Seq[String] = records.map(a =>
+       if (attribute == HealthRecordBirthday)
+         formatDate(a.m_Birthday)
+       //        DateFormat.getDateInstance(DateFormat.SHORT).format(a.m_Birthday)
+       else if (attribute == HealthRecordZipCode)
+         a.m_ZipCode
+       else
+         return mutable.Map()
+     )
+     for (record <- recordAttributes) {
+       if (map.contains(record)) {
+         map(record) = map(record) + 1
+       } else {
+         map(record) = 1
+       }
+     }
+     for (key <- map.keys) {
+       map(key) = map(key) / records.size
+     }
+     map
+   }
 }
