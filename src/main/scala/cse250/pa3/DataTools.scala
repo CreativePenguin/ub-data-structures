@@ -146,7 +146,8 @@
     //      .map(a => ((a.m_Birthday, a.m_ZipCode), a)).toMap
     val healthMap: mutable.Map[(Date, String), HealthRecord] = mutable.Map()
     for (i <- healthRecords) {
-      if (i.m_Birthday.toString == "" || i.m_ZipCode == "") {}
+      if (i.m_Birthday.toString == "" || i.m_ZipCode == "" ||
+        i.m_Birthday == null || i.m_ZipCode == null) {}
       else if (healthMap.contains((i.m_Birthday, i.m_ZipCode))) {
         healthMap.remove((i.m_Birthday, i.m_ZipCode))
       } else {
