@@ -11,7 +11,7 @@
  */
 package cse250.pa3
 
-import cse250.objects.{HealthRecordBirthday, HealthRecordZipCode}
+import cse250.objects.{HealthRecord, HealthRecordBirthday, HealthRecordZipCode, VoterRecord}
 import org.scalatest.flatspec.AnyFlatSpec
 
 import java.io.File
@@ -113,6 +113,27 @@ class DataToolsTests extends AnyFlatSpec
   //
   //    assert(deanonymized("SIMON DURAN").m_DogAllergy)
   //  }
+
+  "identifyPersons" must "work under null or some shit" in {
+    var health = DataTools.loadHealthRecords(
+      new File("src/test/resources/Health-Records-10.csv")
+    )
+
+    health = health :+ HealthRecord(null, null,
+      m_Glasses = true, m_DogAllergy = false, m_BrownHair = false, m_BlueEyes = true)
+
+    var voter = DataTools.loadVoterRecords(
+      new File("src/test/resources/Voter-Records-10.csv")
+    )
+
+    voter = voter :+ VoterRecord("Snail", "Mail", null, null)
+    voter = voter :+ VoterRecord("Jeremy", "Beremy", null, null)
+
+    val deanonymized = DataTools.identifyPersons(voter, health)
+
+    assert(deanonymized("Snail Mail").m_Glasses)
+    assert(deanonymized("Jeremy Beremy").m_Glasses)
+  }
 
   "computeHealthRecordDist" must "Compute Statistics for ZipCode" in {
     val records = DataTools.loadHealthRecords(
