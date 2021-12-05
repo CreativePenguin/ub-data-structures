@@ -78,7 +78,7 @@ class DataToolsTests extends AnyFlatSpec
 
     /*  The 10-row test data has matches for **every** record.  This 
         will not usually be the case! */
-    for(v <- voter) {
+    for (v <- voter) {
       assert(deanonymized.keySet contains v.fullName)
     }
 
@@ -87,8 +87,21 @@ class DataToolsTests extends AnyFlatSpec
     assert(deanonymized("NIA GONZALEZ").m_BrownHair == true)
   }
 
-  "computeHealthRecordDist" must "Compute Statistics for ZipCode" in 
-  {
+  //  "identifyPersons" must "exclude duplicate dates" in {
+  //    val health = DataTools.loadHealthRecords(
+  //      new File("src/test/resources/Health-Records-100.csv")
+  //    )
+  //
+  //    val voter = DataTools.loadVoterRecords(
+  //      new File("src/test/resources/Voter-Records-10.csv")
+  //    )
+  //
+  //    val deanonymized = DataTools.identifyPersons(voter, health)
+  //
+  //    assert(deanonymized("SIMON DURAN").m_DogAllergy)
+  //  }
+
+  "computeHealthRecordDist" must "Compute Statistics for ZipCode" in {
     val records = DataTools.loadHealthRecords(
       new File("src/test/resources/Health-Records-100.csv")
     )

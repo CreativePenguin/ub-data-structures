@@ -146,36 +146,39 @@
     //      .map(a => ((a.m_Birthday, a.m_ZipCode), a)).toMap
     val healthMap: mutable.Map[(Date, String), HealthRecord] = mutable.Map()
     for (i <- healthRecords) {
-      if (healthMap.contains((i.m_Birthday, i.m_ZipCode))) {
+      if (healthMap.contains((i.m_Birthday, i.m_ZipCode)) ||
+        i.m_Birthday.toString == "" || i.m_ZipCode == "") {
         healthMap.remove((i.m_Birthday, i.m_ZipCode))
       } else {
         healthMap((i.m_Birthday, i.m_ZipCode)) = i
       }
     }
     val identifyMap: mutable.Map[String, HealthRecord] = mutable.HashMap()
-    // TODO: Remove duplicates from (voter.m_Birthday, voter.m_ZipCode)
     for (voter <- voterRecords) {
-      val key = (voter.m_Birthday, voter.m_ZipCode)
-      if (healthMap.contains(key)) {
-        identifyMap(voter.fullName) = healthMap(key)
+      if (voter.m_Birthday.toString == "" || voter.m_ZipCode == "") {}
+      else {
+        val key = (voter.m_Birthday, voter.m_ZipCode)
+        if (healthMap.contains(key)) {
+          identifyMap(voter.fullName) = healthMap(key)
+        }
       }
     }
     identifyMap
   }
 
-   def removeDup(bdaynzip: Seq[(String, String)]): Seq[(String, String)] = {
-     val bdaynzipdistinct = bdaynzip.distinct
-     var noDupList: Seq[(String, String)] = Seq()
-     //    val noDupList: mutable.Seq[(String, String)] = mutable.Seq()
-     var offset = 0
-     for (i <- bdaynzip.slice(0, bdaynzip.length - 1).indices) {
-       if (bdaynzip(i + 1) != bdaynzipdistinct(i - offset + 1)) {
-         offset += 1
-       }
-       noDupList
-     }
-     noDupList
-   }
+   //   def removeDup(bdaynzip: Seq[(String, String)]): Seq[(String, String)] = {
+   //     val bdaynzipdistinct = bdaynzip.distinct
+   //     var noDupList: Seq[(String, String)] = Seq()
+   //     //    val noDupList: mutable.Seq[(String, String)] = mutable.Seq()
+   //     var offset = 0
+   //     for (i <- bdaynzip.slice(0, bdaynzip.length - 1).indices) {
+   //       if (bdaynzip(i + 1) != bdaynzipdistinct(i - offset + 1)) {
+   //         offset += 1
+   //       }
+   //       noDupList
+   //     }
+   //     noDupList
+   //   }
 
    /**
     * Compute a histogram over one of the attributes of HealthRecord
