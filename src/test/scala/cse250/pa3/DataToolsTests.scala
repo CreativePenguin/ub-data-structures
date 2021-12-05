@@ -61,10 +61,23 @@ class DataToolsTests extends AnyFlatSpec
     assert(records(0).m_FirstName != "First Name", "Accidentally loading the header row")
     assert(records.size == 10, "Not loading the right number of records")
 
-    assert(records.map { _.m_FirstName} contains "LILY")
-    assert(records.map { _.m_FirstName} contains "KARA")
-    assert(records.map { _.m_FirstName} contains "DEWEY")
+    assert(records.map {
+      _.m_FirstName
+    } contains "LILY")
+    assert(records.map {
+      _.m_FirstName
+    } contains "KARA")
+    assert(records.map {
+      _.m_FirstName
+    } contains "DEWEY")
   }
+
+  //  "loadFunctions" should "have null values" in {
+  //    val health = DataTools.loadHealthRecords(
+  //      new File("src/test/resources/Health-Records-10.csv"))
+  //    assert(health(10).m_ZipCode == "")
+  //    println(health)
+  //  }
 
   "identifyPersons" must "Identify Persons" in {
     val health = DataTools.loadHealthRecords(
