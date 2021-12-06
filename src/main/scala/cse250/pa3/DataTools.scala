@@ -166,6 +166,10 @@
         val key = (voter.m_Birthday, voter.m_ZipCode)
         if (healthMap.contains(key)) {
           identifyMap(voter.fullName) = healthMap(key)
+        } else if (healthMap.contains((voter.m_Birthday, null))) {
+          identifyMap(voter.fullName) = healthMap((voter.m_Birthday, null))
+        } else if (healthMap.contains((null, voter.m_ZipCode))) {
+          identifyMap(voter.fullName) = healthMap((null, voter.m_ZipCode))
         }
       }
     }
