@@ -119,20 +119,55 @@ class DataToolsTests extends AnyFlatSpec
       new File("src/test/resources/Health-Records-10.csv")
     )
 
-    health = health :+ HealthRecord(null, null,
+    health = health :+ HealthRecord(null, "11111",
       m_Glasses = true, m_DogAllergy = false, m_BrownHair = false, m_BlueEyes = true)
+
+    //    health = health :+ HealthRecord(null, null,
+    //      m_Glasses = true, m_DogAllergy = false, m_BrownHair = false, m_BlueEyes = true)
 
     var voter = DataTools.loadVoterRecords(
       new File("src/test/resources/Voter-Records-10.csv")
     )
 
-    voter = voter :+ VoterRecord("Snail", "Mail", null, null)
-    voter = voter :+ VoterRecord("Jeremy", "Beremy", null, null)
+    voter = voter :+ VoterRecord("SNAIL", "MAIL", null, "1111")
+    //    voter = voter :+ VoterRecord("Jeremy", "Beremy", null, null)
+
+    var deanonymized = DataTools.identifyPersons(voter, health)
+
+    assert(deanonymized.contains("SNAIL MAIL"))
+
+    health = health :+ HealthRecord(null, "11111",
+      m_Glasses = true, m_DogAllergy = false, m_BrownHair = false, m_BlueEyes = true)
+
+    deanonymized = DataTools.identifyPersons(voter, health)
+
+    assert(!deanonymized.contains("SNAIL MAIL"))
+    //    assert(!deanonymized("Snail Mail").m_Glasses)
+    //    assert(!deanonymized("Jeremy Beremy").m_Glasses)
+  }
+
+  "identifyPersons" must "not have dups" in {
+    var health = DataTools.loadHealthRecords(
+      new File("src/test/resources/Health-Records-10.csv")
+    )
+    var voter = DataTools.loadVoterRecords(
+      new File("src/test/resources/Voter-Records-10.csv")
+    )
+
+    health = health :+ HealthRecord(
+      DataTools.parseDate("9/23/1996"), "14209",
+      true, true, true, true
+    )
+
+    health = health :+ HealthRecord(
+      DataTools.parseDate("9/23/1996"), "14209",
+      true, true, true, true
+    )
 
     val deanonymized = DataTools.identifyPersons(voter, health)
 
-    assert(deanonymized("Snail Mail").m_Glasses)
-    assert(deanonymized("Jeremy Beremy").m_Glasses)
+    assert(!deanonymized.contains("EMELIA STEWART"))
+    println(deanonymized)
   }
 
   "computeHealthRecordDist" must "Compute Statistics for ZipCode" in {

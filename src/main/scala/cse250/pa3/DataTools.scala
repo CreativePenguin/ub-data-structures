@@ -145,15 +145,20 @@
     //    val healthMap: Map[(Date, String), HealthRecord] = healthRecords
     //      .map(a => ((a.m_Birthday, a.m_ZipCode), a)).toMap
     val healthMap: mutable.Map[(Date, String), HealthRecord] = mutable.Map()
+    val dupMap: mutable.Map[(Date, String), Boolean] = mutable.Map()
     for (i <- healthRecords) {
       //      if (i.m_Birthday.toString == "" || i.m_ZipCode == "" ||
-      //        i.m_Birthday == null || i.m_ZipCode == null) {}
-      if (healthMap.contains((i.m_Birthday, i.m_ZipCode))) {
+      if (dupMap.contains((i.m_Birthday, i.m_ZipCode))) {}
+      else if (healthMap.contains((i.m_Birthday, i.m_ZipCode))) {
         healthMap.remove((i.m_Birthday, i.m_ZipCode))
+        dupMap((i.m_Birthday, i.m_ZipCode)) = true
+        dupMap((i.m_Birthday, null)) = true
+        dupMap((null, i.m_ZipCode)) = true
       } else {
         healthMap((i.m_Birthday, i.m_ZipCode)) = i
       }
     }
+
     val identifyMap: mutable.Map[String, HealthRecord] = mutable.HashMap()
     for (voter <- voterRecords) {
       //      if (voter.m_Birthday.toString == "" || voter.m_ZipCode == "") {}
